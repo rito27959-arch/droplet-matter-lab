@@ -1,0 +1,29 @@
+name: droplet_glass
+description: "Droplet Glass : la matière Prismatic Aether. Shaders, rendu, eau, verre, géométrie, lumière."
+publish_to: "none"
+version: 0.2.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  droplet_core:
+    path: ../droplet_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  shaders:
+    - shaders/e01_prismatic_surface.frag
+    - shaders/e02_morphing_object.frag
+    - shaders/e03_aether_atmosphere.frag
+    - shaders/e04_prismatic_morph.frag
+    - shaders/e05_interactive_matter.frag
+    - shaders/e06_signature.frag
+    - shaders/water_glass.frag
+    - shaders/liquid_bar.frag

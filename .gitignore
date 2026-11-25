@@ -7,7 +7,8 @@ build/
 .idea/
 *.iml
 .DS_Store
-/android/local.properties
-/android/key.properties
+android/local.properties
+android/key.properties
 *.jks
 *.keystore
+.flutter/

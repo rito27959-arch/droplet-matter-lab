@@ -1,0 +1,28 @@
+name: droplet_matter_lab
+description: "Droplet Matter Lab : l'application d'essai des bibliothèques Droplet (core, glass, ui)."
+publish_to: "none"
+version: 0.2.0+2
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  droplet_core:
+    path: ../packages/droplet_core
+  droplet_glass:
+    path: ../packages/droplet_glass
+  droplet_ui:
+    path: ../packages/droplet_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/scene.jpg

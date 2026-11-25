@@ -1,0 +1,25 @@
+name: droplet_core
+description: "Droplet Core : niveaux de qualité, mouvement à ressorts, mesure des images, saisie du pointeur, polices de la marque."
+publish_to: "none"
+version: 0.2.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  fonts:
+    - family: Commissioner
+      fonts:
+        - asset: assets/fonts/Commissioner-Variable.ttf
+    - family: MartianMono
+      fonts:
+        - asset: assets/fonts/MartianMono-Variable.ttf

@@ -16,13 +16,14 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-SRC = ROOT / "shaders" / "src"
-OUT = ROOT / "shaders"
+SHADERS = ROOT / "packages" / "droplet_glass" / "shaders"
+SRC = SHADERS / "src"
+OUT = SHADERS
 BENCH = ROOT / "tool" / "bench"
 INCLUDE = re.compile(r'^\s*#include\s+"([^"]+)"\s*$')
 
 FLUTTER_HEADER = (
-    "// FICHIER GÉNÉRÉ par tool/build_shaders.py depuis shaders/src : ne pas modifier.\n"
+    "// FICHIER GÉNÉRÉ par tool/build_shaders.py depuis packages/droplet_glass/shaders/src : ne pas modifier.\n"
     "#version 460 core\n"
     "#include <flutter/runtime_effect.glsl>\n"
     "precision highp float;\n"

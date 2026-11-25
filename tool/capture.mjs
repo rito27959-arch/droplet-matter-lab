@@ -18,6 +18,8 @@ const shots = [
   { name: '06-signature', query: 'e=6&q=ultra&t=12&cycle=2.15' },
   { name: '06-signature-balanced', query: 'e=6&q=balanced&t=12&cycle=2.15' },
   { name: '01-surface-low', query: 'e=1&q=low&t=12' },
+  { name: '07-pluie', query: 'e=7&q=ultra&t=12', wipe: true },
+  { name: '08-barre-liquide', query: 'e=8&q=ultra&t=12', drag: true },
 ];
 
 const browser = await chromium.launch({
@@ -33,8 +35,24 @@ for (const theme of ['dark', 'light']) {
     await page.goto(`${base}?${s.query}&theme=${theme}`, { waitUntil: 'networkidle' });
     await page.waitForSelector('flt-glass-pane, flutter-view', { timeout: 60000 }).catch(() => {});
     await page.waitForTimeout(6000);
+    if (s.wipe) {
+      // Un doigt essuie la buée en zigzag.
+      await page.mouse.move(60, 330);
+      await page.mouse.down();
+      for (let i = 0; i <= 30; i++) await page.mouse.move(60 + i * 9, 330 + Math.sin(i / 3) * 26, { steps: 2 });
+      await page.mouse.up();
+      await page.waitForTimeout(1200);
+    }
+    if (s.drag) {
+      // La lentille est tenue entre deux onglets : elle se soulève et s'étire.
+      await page.mouse.move(80, 718);
+      await page.mouse.down();
+      await page.mouse.move(170, 718, { steps: 12 });
+      await page.waitForTimeout(250);
+    }
     const file = `${out}/${s.name}-${theme === 'dark' ? 'sombre' : 'clair'}.png`;
     await page.screenshot({ path: file });
+    if (s.drag) await page.mouse.up();
     console.log(`${file}${errors.length ? '  ERREURS : ' + errors.join(' | ').slice(0, 800) : ''}`);
     if (errors.length) failures++;
     await page.close();

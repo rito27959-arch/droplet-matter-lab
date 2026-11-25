@@ -1,0 +1,20 @@
+name: droplet_ui
+description: "Droplet UI : composants prêts à l'emploi. WaterGlass (eau qui glisse sur la vitre) et LiquidTabBar (barre d'onglets en verre liquide)."
+publish_to: "none"
+version: 0.2.0
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  droplet_core:
+    path: ../droplet_core
+  droplet_glass:
+    path: ../droplet_glass
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
