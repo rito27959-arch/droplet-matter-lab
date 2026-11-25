@@ -1,0 +1,367 @@
+---
+import Base from '../layouts/Base.astro';
+
+const transports = [
+  { nom: 'Bluetooth LE', portee: '≈ 10 à 100 m', usage: 'Découverte, messages' },
+  { nom: 'Wi-Fi local', portee: 'Haut débit', usage: 'Fichiers, appels' },
+  { nom: 'Wi-Fi Direct', portee: '≈ 50 à 200 m', usage: 'Liens sans aucune infrastructure' },
+];
+---
+<Base
+  title="Droplet — exemple du design system"
+  description="Page d’exemple du Droplet Design Language : Prismatic Aether sur une base Quiet Futurism."
+>
+  <section class="vitre" aria-labelledby="titre">
+    <div class="vitre-fond" aria-hidden="true"></div>
+    <canvas class="vitre-eau" aria-hidden="true"></canvas>
+    <div class="vitre-voile" aria-hidden="true"></div>
+    <div class="vitre-texte conteneur">
+      <h1 id="titre" class="display">Vos messages passent, même quand le réseau ne passe plus.</h1>
+      <p class="chapo">
+        Droplet relie les téléphones entre eux par Bluetooth et Wi-Fi. Pas d’internet, pas d’opérateur, pas de serveur au milieu.
+      </p>
+      <div class="boutons">
+        <a class="bouton bouton-principal" href="#telecharger">Télécharger pour Android</a>
+        <a class="bouton bouton-secondaire" href="#chemin">Voir comment ça passe</a>
+      </div>
+      <p class="caption indice">Passez le doigt sur la vitre : la buée s’en va, puis revient.</p>
+    </div>
+  </section>
+
+  <section id="chemin" class="section conteneur" aria-labelledby="titre-chemin">
+    <div class="intro">
+      <h2 id="titre-chemin" class="headline">Un message trouve son chemin, de téléphone en téléphone.</h2>
+      <p class="body doux">
+        Hors de portée directe, le message traverse les appareils qui se trouvent entre vous, jusqu’à cinq sauts.
+        Personne autour ? Il attend sur le téléphone et part dès qu’un appareil passe à portée.
+      </p>
+    </div>
+
+    <figure class="parcours" aria-label="Amina écrit à Bilal ; le message passe par deux téléphones relais.">
+      <svg viewBox="0 0 1000 170" role="img" aria-hidden="true">
+        <path class="trajet" d="M70 92 C 220 20, 300 20, 380 92 S 540 164, 620 92 S 800 20, 930 92" />
+        <path class="trajet-coupe" d="M70 128 Q 500 210 930 128" />
+        <g class="noeud" transform="translate(70 92)"><circle r="9" /></g>
+        <g class="noeud relais" transform="translate(380 92)"><circle r="7" /></g>
+        <g class="noeud relais" transform="translate(620 92)"><circle r="7" /></g>
+        <g class="noeud" transform="translate(930 92)"><circle r="9" /></g>
+        <circle class="goutte" r="6" />
+      </svg>
+      <ol class="etapes">
+        <li><span class="label">Amina</span><span class="technique doux">BLE</span></li>
+        <li><span class="label">Relais</span><span class="technique doux">Wi-Fi Direct</span></li>
+        <li><span class="label">Relais</span><span class="technique doux">BLE</span></li>
+        <li><span class="label">Bilal</span><span class="caption">Hors de portée d’Amina</span></li>
+      </ol>
+    </figure>
+
+    <table class="transports">
+      <caption class="caption">Les trois radios que Droplet utilise</caption>
+      <thead>
+        <tr><th scope="col">Transport</th><th scope="col">Portée</th><th scope="col">Sert à</th></tr>
+      </thead>
+      <tbody>
+        {transports.map((t) => (
+          <tr>
+            <th scope="row" class="label">{t.nom}</th>
+            <td class="technique">{t.portee}</td>
+            <td>{t.usage}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section manifeste conteneur" aria-label="Pourquoi Droplet">
+    <p class="editorial">
+      Toutes les messageries supposent que le réseau est là. Quand il tombe, panne, zone blanche ou plus de crédit,
+      elles s’arrêtent toutes en même temps, au moment où l’on a le plus besoin de joindre quelqu’un.
+      Droplet part de l’hypothèse inverse&nbsp;: il n’y a pas de réseau.
+    </p>
+  </section>
+
+  <section id="confidentialite" class="section conteneur confidentialite" aria-labelledby="titre-conf">
+    <h2 id="titre-conf" class="headline">Personne au milieu.</h2>
+    <dl class="faits">
+      <div>
+        <dt class="subtitle">Chiffré de bout en bout</dt>
+        <dd class="body doux">
+          <span class="technique">X25519</span> pour l’échange de clés, <span class="technique">AES-256-GCM</span> pour les messages.
+        </dd>
+      </div>
+      <div>
+        <dt class="subtitle">Des relais qui ne lisent rien</dt>
+        <dd class="body doux">Les téléphones qui transportent votre message ne peuvent pas l’ouvrir.</dd>
+      </div>
+      <div>
+        <dt class="subtitle">Aucun serveur</dt>
+        <dd class="body doux">Vos messages ne s’accumulent nulle part ailleurs que sur les téléphones de la conversation.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section id="telecharger" class="section conteneur fin" aria-labelledby="titre-fin">
+    <h2 id="titre-fin" class="headline">Prêt avant la prochaine coupure.</h2>
+    <p class="body doux">Pour Android 7.0 ou plus récent.</p>
+    <div class="boutons">
+      <a class="bouton bouton-principal" href="https://github.com/rito27959-arch/droplet/releases/latest">Télécharger pour Android</a>
+      <a class="bouton bouton-discret" href="https://dropletmesh.app/security/">Lire la page sécurité</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { mountWater } from '../scripts/rain';
+
+  const canvas = document.querySelector<HTMLCanvasElement>('.vitre-eau');
+  if (canvas) {
+    const ok = mountWater(canvas, { dark: '/images/vitre-sombre.jpg', light: '/images/vitre-clair.jpg' }, () => ({
+      dark: document.documentElement.dataset.theme === 'dark',
+      fog: 1,
+      refraction: 300,
+      rate: innerWidth > 900 ? 12 : 7,
+    }));
+    if (!ok) canvas.remove();
+  }
+
+  // Le trajet du message : un seul mouvement, joué quand la figure entre à l'écran.
+  const fig = document.querySelector<SVGSVGElement>('.parcours svg');
+  const path = fig?.querySelector<SVGPathElement>('.trajet');
+  const drop = fig?.querySelector<SVGCircleElement>('.goutte');
+  if (fig && path && drop) {
+    const len = path.getTotalLength();
+    const place = (t: number) => {
+      const p = path.getPointAtLength(len * t);
+      drop.setAttribute('cx', String(p.x));
+      drop.setAttribute('cy', String(p.y));
+    };
+    place(0);
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let played = false;
+    new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting || played) return;
+      played = true;
+      if (reduce) return place(1);
+      const start = performance.now();
+      const dur = 2600;
+      const tick = (now: number) => {
+        const k = Math.min((now - start) / dur, 1);
+        // Pause à chaque relais : le message attend, puis repart.
+        const seg = Math.min(Math.floor(k * 3), 2);
+        const local = k * 3 - seg;
+        const ease = local < 0.75 ? 1 - Math.pow(1 - local / 0.75, 3) : 1;
+        place(Math.min((seg + ease) / 3, 1));
+        if (k < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }, { threshold: 0.6 }).observe(fig);
+  }
+</script>
+
+<style>
+  .vitre {
+    position: relative;
+    min-height: max(640px, 100svh);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .vitre-fond,
+  .vitre-eau,
+  .vitre-voile {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .vitre-fond {
+    z-index: -3;
+    background: url('/images/vitre-clair.jpg') center / cover;
+    filter: blur(16px) saturate(0.9);
+    transform: scale(1.06);
+  }
+  :root[data-theme='dark'] .vitre-fond {
+    background-image: url('/images/vitre-sombre.jpg');
+  }
+  .vitre-eau {
+    z-index: -2;
+    touch-action: pan-y;
+    cursor: grab;
+    opacity: 0;
+    transition: opacity 600ms var(--courbe-standard);
+  }
+  .vitre-eau[data-ready='true'] {
+    opacity: 1;
+  }
+  .vitre-voile {
+    z-index: -1;
+    background: var(--voile-vitre);
+    pointer-events: none;
+  }
+  .vitre-texte {
+    padding-block: 140px clamp(40px, 8vh, 88px);
+    pointer-events: none;
+  }
+  .vitre-texte .display {
+    max-width: 15ch;
+  }
+  .chapo {
+    max-width: 46ch;
+    margin: var(--e-5) 0 0;
+    font-size: clamp(17px, 1.6vw, 20px);
+    line-height: 1.5;
+  }
+  .boutons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+    margin-top: var(--e-6);
+    pointer-events: auto;
+  }
+  .vitre .bouton-secondaire {
+    background: color-mix(in srgb, var(--surface) 55%, transparent);
+    border-color: color-mix(in srgb, var(--encre) 18%, transparent);
+  }
+  .indice {
+    margin: var(--e-5) 0 0;
+  }
+
+  .section {
+    padding-top: var(--e-9);
+  }
+  .intro {
+    display: grid;
+    gap: var(--e-5);
+    max-width: 760px;
+  }
+  .intro .body {
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  .parcours {
+    margin: var(--e-8) 0 0;
+  }
+  .parcours svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .trajet {
+    fill: none;
+    stroke: var(--encre);
+    stroke-width: 1.5;
+  }
+  .trajet-coupe {
+    fill: none;
+    stroke: var(--trait);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 8;
+    stroke-linecap: round;
+  }
+  .noeud circle {
+    fill: var(--encre);
+  }
+  .noeud.relais circle {
+    fill: var(--fond);
+    stroke: var(--encre);
+    stroke-width: 1.5;
+  }
+  .goutte {
+    fill: var(--encre);
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--encre) 45%, transparent));
+  }
+  .etapes {
+    list-style: none;
+    padding: 0;
+    margin: var(--e-3) 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .etapes li {
+    display: grid;
+    gap: 2px;
+  }
+  .etapes li:nth-child(2),
+  .etapes li:nth-child(3) {
+    text-align: center;
+  }
+  .etapes li:last-child {
+    text-align: right;
+  }
+
+  .transports {
+    width: 100%;
+    margin-top: var(--e-8);
+    border-collapse: collapse;
+    caption-side: top;
+    text-align: left;
+  }
+  .transports caption {
+    text-align: left;
+    padding-bottom: var(--e-3);
+  }
+  .transports th,
+  .transports td {
+    padding: 14px var(--e-4) 14px 0;
+    border-top: 1px solid var(--trait);
+    vertical-align: baseline;
+  }
+  .transports td.technique {
+    white-space: nowrap;
+  }
+  .transports thead th {
+    font-size: var(--t-caption);
+    font-weight: 500;
+    color: var(--encre-douce);
+    border-top: 0;
+  }
+
+  .manifeste .editorial {
+    max-width: 34ch;
+    margin: 0 0 0 auto;
+  }
+
+  .confidentialite {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--e-7);
+    align-items: start;
+  }
+  .faits {
+    margin: 0;
+    display: grid;
+    gap: var(--e-6);
+  }
+  .faits dd {
+    margin: var(--e-2) 0 0;
+    max-width: 52ch;
+  }
+
+  .fin {
+    text-align: left;
+  }
+  .fin .body {
+    margin: var(--e-4) 0 0;
+  }
+
+  @media (max-width: 760px) {
+    .confidentialite {
+      grid-template-columns: 1fr;
+      gap: var(--e-6);
+    }
+    .manifeste .editorial {
+      margin-left: 0;
+    }
+    .etapes {
+      font-size: 13px;
+    }
+    .etapes .caption {
+      display: none;
+    }
+    .section {
+      padding-top: var(--e-8);
+    }
+  }
+</style>

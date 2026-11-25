@@ -1,0 +1,325 @@
+/* Droplet Design Language — base Quiet Futurism, matière Prismatic Aether.
+   Neutres froids, une seule encre. La couleur vient de la lumière (la vitre,
+   le liseré du verre), pas de l'interface. Couleur d'action : décision G3,
+   pas encore prise — l'encre en tient lieu. */
+
+@font-face {
+  font-family: 'Commissioner';
+  src: url('/fonts/commissioner.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Martian Mono';
+  src: url('/fonts/martian-mono.woff2') format('woff2');
+  font-weight: 100 800;
+  font-stretch: 75% 112.5%;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Newsreader';
+  src: url('/fonts/newsreader.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+:root {
+  /* Primitifs */
+  --gris-0: #ffffff;
+  --gris-50: #f3f5f7;
+  --gris-100: #e6eaee;
+  --gris-200: #c9d0d6;
+  --gris-500: #59626b;
+  --gris-550: #8d97a1;
+  --gris-800: #1d242b;
+  --gris-850: #12171c;
+  --gris-900: #0b0f13;
+  --gris-950: #05070a;
+  --encre-clair: #0e1216;
+  --encre-sombre: #edf1f4;
+
+  /* Sémantiques, thème clair */
+  --fond: var(--gris-100);
+  --surface: var(--gris-50);
+  --surface-haute: var(--gris-0);
+  --encre: var(--encre-clair);
+  --encre-douce: var(--gris-500);
+  --trait: var(--gris-200);
+  --erreur: #b4232c;
+  --verre: rgb(243 245 247 / 0.58);
+  --verre-trait: rgb(255 255 255 / 0.7);
+  --verre-ombre: 0 10px 30px rgb(14 18 22 / 0.12), 0 1px 2px rgb(14 18 22 / 0.08);
+  --voile-vitre: linear-gradient(180deg, rgb(230 234 238 / 0) 40%, rgb(230 234 238 / 0.88));
+  --sur-encre: var(--gris-50);
+
+  /* Géométrie */
+  --r-controle: 12px;
+  --r-feuille: 28px;
+  --r-pilule: 999px;
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 24px;
+  --e-6: 32px;
+  --e-7: 48px;
+  --e-8: 72px;
+  --e-9: 112px;
+  --gouttiere: 16px;
+  --largeur: 1160px;
+
+  /* Mouvement */
+  --courbe-standard: cubic-bezier(0.2, 0, 0, 1);
+  --courbe-entree: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --courbe-ressort: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --duree-courte: 160ms;
+  --duree-moyenne: 260ms;
+
+  /* Typographie : tailles de l'échelle DDL, ×1,4 au-delà de 1024 px pour l'affichage */
+  --t-display: clamp(40px, 7.2vw, 78px);
+  --t-headline: clamp(32px, 4.6vw, 56px);
+  --t-title: 28px;
+  --t-subtitle: 20px;
+  --t-body: 16px;
+  --t-label: 14px;
+  --t-caption: 12px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --fond: var(--gris-950);
+  --surface: var(--gris-900);
+  --surface-haute: var(--gris-850);
+  --encre: var(--encre-sombre);
+  --encre-douce: var(--gris-550);
+  --trait: var(--gris-800);
+  --erreur: #ff8a8a;
+  --verre: rgb(11 15 19 / 0.5);
+  --verre-trait: rgb(255 255 255 / 0.14);
+  --verre-ombre: 0 12px 36px rgb(0 0 0 / 0.45), 0 1px 2px rgb(0 0 0 / 0.4);
+  --voile-vitre: linear-gradient(180deg, rgb(5 7 10 / 0) 35%, rgb(5 7 10 / 0.86));
+  --sur-encre: var(--gris-950);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--encre);
+  font-family: 'Commissioner', system-ui, sans-serif;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  font-variation-settings: 'FLAR' 0, 'VOLM' 0;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color var(--duree-moyenne) var(--courbe-standard), color var(--duree-moyenne) var(--courbe-standard);
+}
+
+img,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--encre);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.conteneur {
+  width: min(100% - 2 * var(--gouttiere), var(--largeur));
+  margin-inline: auto;
+}
+
+/* Rôles typographiques. Le Flair diminue avec la taille : signature en titre,
+   absent du texte courant. */
+.display {
+  font-size: var(--t-display);
+  line-height: 1.04;
+  font-weight: 640;
+  letter-spacing: -0.025em;
+  font-variation-settings: 'FLAR' 80, 'VOLM' 30;
+  text-wrap: balance;
+  margin: 0;
+}
+.headline {
+  font-size: var(--t-headline);
+  line-height: 1.08;
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'FLAR' 70, 'VOLM' 20;
+  text-wrap: balance;
+  margin: 0;
+}
+.title {
+  font-size: var(--t-title);
+  line-height: 34px;
+  font-weight: 660;
+  letter-spacing: -0.015em;
+  font-variation-settings: 'FLAR' 50;
+  margin: 0;
+}
+.subtitle {
+  font-size: var(--t-subtitle);
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  font-variation-settings: 'FLAR' 20;
+  margin: 0;
+}
+.body {
+  font-size: var(--t-body);
+  line-height: 24px;
+}
+.label {
+  font-size: var(--t-label);
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+.caption {
+  font-size: var(--t-caption);
+  line-height: 16px;
+  font-weight: 450;
+  letter-spacing: 0.015em;
+  color: var(--encre-douce);
+}
+.technique {
+  font-family: 'Martian Mono', ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 450;
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-stretch: 92%;
+}
+.editorial {
+  font-family: 'Newsreader', Georgia, serif;
+  font-size: clamp(22px, 2.6vw, 32px);
+  line-height: 1.42;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  text-wrap: pretty;
+}
+.doux {
+  color: var(--encre-douce);
+}
+
+/* Boutons */
+.bouton {
+  --h: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--e-2);
+  height: var(--h);
+  padding-inline: 22px;
+  border-radius: var(--r-pilule);
+  border: 1px solid transparent;
+  font: 600 15px/1 'Commissioner', system-ui, sans-serif;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--duree-courte) var(--courbe-ressort), background-color var(--duree-courte) var(--courbe-standard),
+    border-color var(--duree-courte) var(--courbe-standard), opacity var(--duree-courte);
+  -webkit-tap-highlight-color: transparent;
+}
+.bouton:active {
+  transform: scale(0.97);
+}
+.bouton-principal {
+  background: var(--encre);
+  color: var(--sur-encre);
+}
+.bouton-principal:hover {
+  opacity: 0.88;
+}
+.bouton-secondaire {
+  background: transparent;
+  color: var(--encre);
+  border-color: var(--trait);
+}
+.bouton-secondaire:hover {
+  border-color: var(--encre-douce);
+}
+.bouton-discret {
+  background: transparent;
+  color: var(--encre);
+  padding-inline: 10px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+.bouton[disabled],
+.bouton[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+.bouton-petit {
+  --h: 36px;
+  padding-inline: 16px;
+  font-size: 14px;
+}
+
+/* La matière : réservée à la navigation et aux moments forts. */
+.verre {
+  position: relative;
+  background: var(--verre);
+  -webkit-backdrop-filter: blur(18px) saturate(170%);
+  backdrop-filter: blur(18px) saturate(170%);
+  box-shadow: var(--verre-ombre), inset 0 1px 0 var(--verre-trait), inset 0 -1px 0 rgb(255 255 255 / 0.04);
+  isolation: isolate;
+}
+/* Liseré spectral d'un pixel : la lumière décomposée au bord, et seulement là. */
+.verre::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from 200deg, rgb(255 120 120 / 0.0), rgb(255 190 120 / 0.55), rgb(160 255 200 / 0.45), rgb(120 180 255 / 0.55),
+      rgb(210 140 255 / 0.4), rgb(255 120 120 / 0.0) 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.lens .verre[data-lens] {
+  -webkit-backdrop-filter: url(#lentille-nav) blur(10px) saturate(170%);
+  backdrop-filter: url(#lentille-nav) blur(10px) saturate(170%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .verre {
+    background: var(--surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

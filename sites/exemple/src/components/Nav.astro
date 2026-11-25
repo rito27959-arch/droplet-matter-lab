@@ -1,0 +1,146 @@
+---
+interface Props {
+  current: 'accueil' | 'composants';
+}
+const { current } = Astro.props;
+const liens = [
+  { href: '/#chemin', label: 'Comment ça passe', id: 'chemin' },
+  { href: '/#confidentialite', label: 'Confidentialité', id: 'confidentialite' },
+  { href: '/composants/', label: 'Composants', id: 'composants' },
+];
+---
+<header class="nav-place">
+  <nav class="nav verre" data-lens aria-label="Navigation principale">
+    <a class="marque" href="/" aria-label="Droplet, accueil">Droplet</a>
+    <ul class="liens">
+      {liens.map((l) => (
+        <li>
+          <a class="lien label" href={l.href} aria-current={current === l.id ? 'page' : undefined}>{l.label}</a>
+        </li>
+      ))}
+    </ul>
+    <div class="actions">
+      <button class="theme" type="button" aria-label="Passer au thème sombre" data-theme-toggle>
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 3.5a8.5 8.5 0 0 0 0 17Z" fill="currentColor" stroke="none" />
+        </svg>
+      </button>
+      <a class="bouton bouton-principal bouton-petit" href="/#telecharger">Télécharger</a>
+    </div>
+  </nav>
+</header>
+
+<script>
+  import { applyLens } from '../scripts/glass';
+  const nav = document.querySelector<HTMLElement>('.nav');
+  if (nav) applyLens(nav, 'lentille-nav', 14, 16);
+
+  const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const sync = () => {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    btn?.setAttribute('aria-label', dark ? 'Passer au thème clair' : 'Passer au thème sombre');
+  };
+  sync();
+  btn?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+    sync();
+    document.dispatchEvent(new CustomEvent('themechange'));
+  });
+</script>
+
+<style>
+  .nav-place {
+    position: fixed;
+    inset: max(12px, env(safe-area-inset-top)) 0 auto 0;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    padding-inline: 12px;
+    pointer-events: none;
+  }
+  .nav {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--e-4);
+    width: min(100%, 780px);
+    height: 60px;
+    padding: 0 8px 0 22px;
+    border-radius: var(--r-pilule);
+  }
+  .marque {
+    font-size: 21px;
+    font-weight: 680;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'FLAR' 100, 'VOLM' 40;
+    text-decoration: none;
+  }
+  .liens {
+    display: flex;
+    gap: 2px;
+    list-style: none;
+    margin: 0 auto;
+    padding: 0;
+  }
+  .lien {
+    display: block;
+    padding: 8px 12px;
+    border-radius: var(--r-pilule);
+    text-decoration: none;
+    color: var(--encre-douce);
+    transition: color var(--duree-courte) var(--courbe-standard), background-color var(--duree-courte);
+  }
+  .lien:hover,
+  .lien[aria-current='page'] {
+    color: var(--encre);
+  }
+  .lien[aria-current='page'] {
+    background: color-mix(in srgb, var(--encre) 8%, transparent);
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--e-1);
+    margin-left: auto;
+  }
+  .theme {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--encre);
+    cursor: pointer;
+  }
+  .theme:hover {
+    background: color-mix(in srgb, var(--encre) 8%, transparent);
+  }
+  @media (max-width: 720px) {
+    .liens li:not(:last-child) {
+      display: none;
+    }
+    .nav {
+      padding-left: 16px;
+      gap: 4px;
+    }
+    .marque {
+      font-size: 19px;
+    }
+    .lien {
+      padding-inline: 8px;
+    }
+    .actions .bouton {
+      padding-inline: 12px;
+    }
+    .theme {
+      width: 40px;
+    }
+  }
+</style>

@@ -1,0 +1,714 @@
+---
+import Base from '../layouts/Base.astro';
+
+const couleurs = [
+  { nom: 'fond', role: 'Le fond de page' },
+  { nom: 'surface', role: 'Zones posées sur le fond' },
+  { nom: 'surface-haute', role: 'Ce qui se détache : champs, bulles' },
+  { nom: 'encre', role: 'Texte, et action en attendant la décision G3' },
+  { nom: 'encre-douce', role: 'Texte secondaire' },
+  { nom: 'trait', role: 'Filets, bords de contrôle' },
+];
+const echelle = [
+  { role: 'Display', cls: 'display', taille: '56 / 60, Flair 80', texte: 'Une goutte' },
+  { role: 'Headline', cls: 'headline', taille: '40 / 44, Flair 70', texte: 'Passe partout' },
+  { role: 'Title', cls: 'title', taille: '28 / 34, Flair 50', texte: 'Discussions' },
+  { role: 'Subtitle', cls: 'subtitle', taille: '20 / 26, Flair 20', texte: 'Relayé par trois téléphones' },
+  { role: 'Body', cls: 'body', taille: '16 / 24', texte: 'Le message attend sur le téléphone et part dès qu’un appareil passe à portée.' },
+  { role: 'Label', cls: 'label', taille: '14 / 20', texte: 'Envoyer' },
+  { role: 'Caption', cls: 'caption', taille: '12 / 16', texte: 'Vu à 17 h 04' },
+  { role: 'Technique', cls: 'technique', taille: 'Martian Mono 13 / 20', texte: 'AES-256-GCM 0x4F2A 5 sauts' },
+];
+const discussions = [
+  { nom: 'Amina Ndzie', apercu: 'Je viens vers toi', heure: '17:04', relais: 0, nonlu: 2 },
+  { nom: 'Famille', apercu: 'Papa : au marché à 17 h', heure: '16:38', relais: 2, nonlu: 0 },
+  { nom: 'Bilal Kamga', apercu: 'La photo du chantier', heure: '15:12', relais: 3, nonlu: 0 },
+];
+const onglets = [
+  { label: 'Discussions', icone: 'M4 5h16v11H8l-4 4Z' },
+  { label: 'Appels', icone: 'M6 3h3l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2Z' },
+  { label: 'Autour', icone: 'M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M6 12a6 6 0 0 1 12 0M3 12a9 9 0 0 1 18 0' },
+  { label: 'Profil', icone: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0' },
+];
+---
+<Base
+  title="Composants — Droplet Design Language"
+  description="Les composants du Droplet Design Language, dans leurs états."
+  current="composants"
+>
+  <header class="tete conteneur">
+    <h1 class="display">Composants</h1>
+    <p class="body doux">
+      Chaque composant dans ses états, en clair et en sombre. La matière en verre n’apparaît que deux fois : la barre du haut
+      et la barre d’onglets. Tout le reste reste calme.
+    </p>
+  </header>
+
+  <section class="bloc conteneur" aria-labelledby="c-couleur">
+    <h2 id="c-couleur" class="title">Couleur</h2>
+    <p class="body doux note">
+      Neutres froids et une seule encre. La couleur d’action n’est pas encore choisie (décision G3) : l’encre en tient lieu.
+    </p>
+    <ul class="nuancier">
+      {couleurs.map((c) => (
+        <li>
+          <span class="pastille" style={`background: var(--${c.nom})`}></span>
+          <span class="technique">--{c.nom}</span>
+          <span class="caption">{c.role}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-type">
+    <h2 id="c-type" class="title">Typographie</h2>
+    <p class="body doux note">Commissioner pour l’interface, son axe Flair évase les fins de traits en titre. Martian Mono pour les données.</p>
+    <dl class="echelle">
+      {echelle.map((e) => (
+        <div>
+          <dt><span class="label">{e.role}</span><span class="technique doux">{e.taille}</span></dt>
+          <dd class={e.cls}>{e.texte}</dd>
+        </div>
+      ))}
+    </dl>
+    <div class="flair">
+      <label class="label" for="flair">Axe Flair</label>
+      <input id="flair" type="range" min="0" max="100" value="80" />
+      <output class="technique" for="flair">80</output>
+      <p class="flair-demo" aria-live="off">Droplet</p>
+    </div>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-boutons">
+    <h2 id="c-boutons" class="title">Boutons</h2>
+    <div class="rangee">
+      <button class="bouton bouton-principal" type="button">Envoyer</button>
+      <button class="bouton bouton-secondaire" type="button">Joindre un fichier</button>
+      <button class="bouton bouton-discret" type="button">Annuler</button>
+      <button class="bouton bouton-principal" type="button" disabled>Envoyer</button>
+      <button class="bouton bouton-principal bouton-petit" type="button">Petit</button>
+    </div>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-champs">
+    <h2 id="c-champs" class="title">Champs</h2>
+    <div class="grille-2">
+      <div class="champ">
+        <label class="label" for="nom">Nom affiché</label>
+        <input id="nom" type="text" value="Amina" autocomplete="off" />
+        <p class="caption">Visible par les personnes à portée.</p>
+      </div>
+      <div class="champ champ-erreur">
+        <label class="label" for="code">Code de jumelage</label>
+        <input id="code" class="technique-input" type="text" value="4F2A-9" aria-invalid="true" aria-describedby="code-err" />
+        <p class="caption" id="code-err">Le code a 8 caractères. Vérifiez l’écran de l’autre téléphone.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-choix">
+    <h2 id="c-choix" class="title">Choix</h2>
+    <div class="grille-2">
+      <div class="pile">
+        <button class="interrupteur" type="button" role="switch" aria-checked="true" data-switch>
+          <span class="label">Servir de relais</span>
+          <span class="piste" aria-hidden="true"><span class="bouton-rond"></span></span>
+        </button>
+        <button class="interrupteur" type="button" role="switch" aria-checked="false" data-switch>
+          <span class="label">Économiser la batterie</span>
+          <span class="piste" aria-hidden="true"><span class="bouton-rond"></span></span>
+        </button>
+      </div>
+      <div class="pile">
+        <div class="segmente" role="radiogroup" aria-label="Portée de découverte" data-segmented>
+          <button type="button" role="radio" aria-checked="false">Proche</button>
+          <button type="button" role="radio" aria-checked="true">Normale</button>
+          <button type="button" role="radio" aria-checked="false">Maximale</button>
+          <span class="curseur" aria-hidden="true"></span>
+        </div>
+        <div class="puces" role="group" aria-label="Filtres">
+          <button class="puce" type="button" aria-pressed="true">Non lus</button>
+          <button class="puce" type="button" aria-pressed="false">Groupes</button>
+          <button class="puce" type="button" aria-pressed="false">En attente d’envoi</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-messages">
+    <h2 id="c-messages" class="title">Discussions et messages</h2>
+    <div class="grille-2">
+      <ul class="liste">
+        {discussions.map((d) => (
+          <li>
+            <a class="ligne" href="#c-messages">
+              <span class="avatar" aria-hidden="true">{d.nom.slice(0, 1)}</span>
+              <span class="ligne-texte">
+                <span class="label">{d.nom}</span>
+                <span class="caption">{d.apercu}</span>
+              </span>
+              <span class="ligne-meta">
+                <span class="technique doux">{d.heure}</span>
+                {d.nonlu > 0 ? <span class="badge" aria-label={`${d.nonlu} non lus`}>{d.nonlu}</span> :
+                  d.relais > 0 ? <span class="caption">{d.relais} relais</span> : null}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div class="fil" aria-label="Exemple de conversation">
+        <p class="bulle entrante">Le réseau est tombé ici. Tu me reçois&nbsp;?</p>
+        <p class="bulle sortante">Oui, par deux relais. J’arrive dans dix minutes.</p>
+        <p class="caption etat">Remis à 17:06, relayé par 2 téléphones</p>
+        <p class="bulle sortante attente">Je prends du pain en passant.</p>
+        <p class="caption etat">En attente : personne à portée pour l’instant</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-barre">
+    <h2 id="c-barre" class="title">Barre d’onglets en verre</h2>
+    <p class="body doux note">
+      La seule matière du contenu, posée sur ce qui défile. Le verre dévie la lumière à son bord ; la lentille de sélection
+      glisse d’un onglet à l’autre.
+    </p>
+    <div class="scene">
+      <div class="scene-contenu" aria-hidden="true">
+        {Array.from({ length: 10 }, (_, i) => (
+          <div class="scene-ligne">
+            <span class="avatar">{'ABFLCMNSTR'[i]}</span>
+            <span class="scene-barres"><span></span><span></span></span>
+          </div>
+        ))}
+      </div>
+      <nav class="onglets verre" aria-label="Exemple de barre d’onglets" data-tabs>
+        <span class="lentille" aria-hidden="true"></span>
+        {onglets.map((o, i) => (
+          <button type="button" class="onglet" aria-current={i === 0 ? 'page' : undefined}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d={o.icone} /></svg>
+            <span>{o.label}</span>
+          </button>
+        ))}
+      </nav>
+    </div>
+  </section>
+
+  <section class="bloc conteneur" aria-labelledby="c-retour">
+    <h2 id="c-retour" class="title">Retour d’action</h2>
+    <div class="rangee">
+      <button class="bouton bouton-secondaire" type="button" data-toast>Copier le lien d’invitation</button>
+    </div>
+    <div class="toast" role="status" aria-live="polite"></div>
+  </section>
+</Base>
+
+<script>
+  // Interrupteurs
+  document.querySelectorAll<HTMLButtonElement>('[data-switch]').forEach((b) =>
+    b.addEventListener('click', () => b.setAttribute('aria-checked', String(b.getAttribute('aria-checked') !== 'true'))),
+  );
+
+  // Contrôle segmenté : clavier comme un groupe radio (flèches).
+  document.querySelectorAll<HTMLElement>('[data-segmented]').forEach((g) => {
+    const items = [...g.querySelectorAll<HTMLButtonElement>('[role=radio]')];
+    const cursor = g.querySelector<HTMLElement>('.curseur')!;
+    const select = (i: number, focus = false) => {
+      items.forEach((b, j) => {
+        b.setAttribute('aria-checked', String(i === j));
+        b.tabIndex = i === j ? 0 : -1;
+      });
+      cursor.style.transform = `translateX(${items[i].offsetLeft - 4}px)`;
+      cursor.style.width = `${items[i].offsetWidth}px`;
+      if (focus) items[i].focus();
+    };
+    items.forEach((b, i) => {
+      b.addEventListener('click', () => select(i));
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') select((i + 1) % items.length, true);
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') select((i - 1 + items.length) % items.length, true);
+      });
+    });
+    const start = items.findIndex((b) => b.getAttribute('aria-checked') === 'true');
+    requestAnimationFrame(() => select(start));
+    addEventListener('resize', () => select(items.findIndex((b) => b.getAttribute('aria-checked') === 'true')));
+  });
+
+  // Puces
+  document.querySelectorAll<HTMLButtonElement>('.puce').forEach((b) =>
+    b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))),
+  );
+
+  // Axe Flair
+  const flair = document.querySelector<HTMLInputElement>('#flair');
+  const out = document.querySelector<HTMLOutputElement>('output[for=flair]');
+  const demo = document.querySelector<HTMLElement>('.flair-demo');
+  flair?.addEventListener('input', () => {
+    if (out) out.value = flair.value;
+    demo?.style.setProperty('--flair', flair.value);
+  });
+
+  // Barre d'onglets : la lentille suit l'onglet choisi, avec un ressort.
+  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((bar) => {
+    const tabs = [...bar.querySelectorAll<HTMLButtonElement>('.onglet')];
+    const lens = bar.querySelector<HTMLElement>('.lentille')!;
+    const move = (i: number) => {
+      tabs.forEach((t, j) => (j === i ? t.setAttribute('aria-current', 'page') : t.removeAttribute('aria-current')));
+      lens.style.transform = `translateX(${tabs[i].offsetLeft}px)`;
+      lens.style.width = `${tabs[i].offsetWidth}px`;
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => move(i));
+      t.addEventListener('pointerdown', () => lens.classList.add('appui'));
+    });
+    addEventListener('pointerup', () => lens.classList.remove('appui'));
+    requestAnimationFrame(() => move(0));
+    addEventListener('resize', () => move(Math.max(0, tabs.findIndex((t) => t.hasAttribute('aria-current')))));
+  });
+
+  // Retour d'action : le texte du toast reprend le verbe du bouton.
+  const toast = document.querySelector<HTMLElement>('.toast');
+  let timer = 0;
+  document.querySelector('[data-toast]')?.addEventListener('click', () => {
+    if (!toast) return;
+    toast.textContent = 'Lien d’invitation copié';
+    toast.classList.add('visible');
+    clearTimeout(timer);
+    timer = window.setTimeout(() => toast.classList.remove('visible'), 2400);
+  });
+</script>
+
+<style>
+  .tete {
+    padding-top: 150px;
+    display: grid;
+    gap: var(--e-5);
+  }
+  .tete .body {
+    max-width: 62ch;
+    margin: 0;
+  }
+  .bloc {
+    padding-top: var(--e-8);
+    display: grid;
+    gap: var(--e-5);
+  }
+  .bloc > .title {
+    padding-top: var(--e-5);
+    border-top: 1px solid var(--trait);
+  }
+  .note {
+    margin: 0;
+    max-width: 62ch;
+  }
+
+  .nuancier {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: var(--e-5) var(--e-4);
+  }
+  .nuancier li {
+    display: grid;
+    gap: 4px;
+  }
+  .pastille {
+    height: 64px;
+    border-radius: var(--r-controle);
+    border: 1px solid var(--trait);
+    margin-bottom: 6px;
+  }
+
+  .echelle {
+    margin: 0;
+    display: grid;
+  }
+  .echelle > div {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--e-4);
+    align-items: baseline;
+    padding-block: var(--e-4);
+    border-bottom: 1px solid var(--trait);
+  }
+  .echelle dt {
+    display: grid;
+    gap: 2px;
+  }
+  .echelle dd {
+    margin: 0;
+    min-width: 0;
+  }
+  .flair {
+    display: grid;
+    grid-template-columns: auto minmax(120px, 280px) 3ch;
+    justify-content: start;
+    align-items: center;
+    gap: var(--e-3);
+    margin-top: var(--e-4);
+  }
+  .flair input {
+    accent-color: var(--encre);
+  }
+  .flair-demo {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: clamp(64px, 12vw, 140px);
+    line-height: 1;
+    font-weight: 660;
+    letter-spacing: -0.03em;
+    font-variation-settings: 'FLAR' var(--flair, 80), 'VOLM' 30;
+  }
+
+  .rangee {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+    align-items: center;
+  }
+  .grille-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--e-6);
+  }
+  .pile {
+    display: grid;
+    gap: var(--e-4);
+    align-content: start;
+  }
+
+  .champ {
+    display: grid;
+    gap: 6px;
+  }
+  .champ input {
+    height: 48px;
+    padding: 0 14px;
+    border-radius: var(--r-controle);
+    border: 1px solid var(--trait);
+    background: var(--surface-haute);
+    color: var(--encre);
+    font: 400 16px 'Commissioner', system-ui, sans-serif;
+    transition: border-color var(--duree-courte) var(--courbe-standard);
+  }
+  .champ input:hover {
+    border-color: var(--encre-douce);
+  }
+  .champ input:focus-visible {
+    outline: 2px solid var(--encre);
+    outline-offset: 1px;
+  }
+  .champ p {
+    margin: 0;
+  }
+  .technique-input {
+    font-family: 'Martian Mono', monospace !important;
+    font-size: 14px !important;
+    letter-spacing: 0.04em;
+  }
+  .champ-erreur input {
+    border-color: var(--erreur);
+  }
+  .champ-erreur .caption {
+    color: var(--erreur);
+  }
+
+  .interrupteur {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--e-4);
+    min-height: 52px;
+    padding: 0 4px 0 0;
+    border: 0;
+    border-bottom: 1px solid var(--trait);
+    background: none;
+    color: var(--encre);
+    cursor: pointer;
+    text-align: left;
+  }
+  .piste {
+    position: relative;
+    width: 50px;
+    height: 30px;
+    border-radius: var(--r-pilule);
+    background: var(--trait);
+    transition: background-color var(--duree-moyenne) var(--courbe-standard);
+  }
+  .bouton-rond {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--gris-0);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+    transition: transform var(--duree-moyenne) var(--courbe-ressort);
+  }
+  [aria-checked='true'] .piste {
+    background: var(--encre);
+  }
+  :root[data-theme='dark'] [aria-checked='true'] .bouton-rond {
+    background: var(--gris-950);
+  }
+  [aria-checked='true'] .bouton-rond {
+    transform: translateX(20px);
+  }
+
+  .segmente {
+    position: relative;
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    padding: 4px;
+    border-radius: var(--r-pilule);
+    background: color-mix(in srgb, var(--encre) 7%, transparent);
+    justify-self: start;
+    isolation: isolate;
+  }
+  .segmente button {
+    height: 36px;
+    padding: 0 18px;
+    border: 0;
+    background: none;
+    color: var(--encre-douce);
+    font: 600 14px 'Commissioner', system-ui, sans-serif;
+    border-radius: var(--r-pilule);
+    cursor: pointer;
+    transition: color var(--duree-courte);
+  }
+  .segmente button[aria-checked='true'] {
+    color: var(--encre);
+  }
+  .curseur {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    height: 36px;
+    border-radius: var(--r-pilule);
+    background: var(--surface-haute);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+    z-index: -1;
+    transition: transform var(--duree-moyenne) var(--courbe-ressort), width var(--duree-moyenne) var(--courbe-standard);
+  }
+
+  .puces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-2);
+  }
+  .puce {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: var(--r-pilule);
+    border: 1px solid var(--trait);
+    background: none;
+    color: var(--encre);
+    font: 500 14px 'Commissioner', system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .puce[aria-pressed='true'] {
+    background: var(--encre);
+    color: var(--sur-encre);
+    border-color: var(--encre);
+  }
+
+  .liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .ligne {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: var(--e-3);
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--trait);
+    text-decoration: none;
+  }
+  .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--encre) 9%, transparent);
+    font-weight: 650;
+    font-variation-settings: 'FLAR' 60;
+  }
+  .ligne-texte,
+  .ligne-meta {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+  .ligne-meta {
+    justify-items: end;
+  }
+  .badge {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: var(--r-pilule);
+    background: var(--encre);
+    color: var(--sur-encre);
+    font: 650 12px/22px 'Commissioner', sans-serif;
+    text-align: center;
+  }
+
+  .fil {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+  }
+  .bulle {
+    margin: 0;
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 20px;
+    line-height: 1.4;
+  }
+  .entrante {
+    justify-self: start;
+    background: var(--surface-haute);
+    border-bottom-left-radius: 6px;
+  }
+  .sortante {
+    justify-self: end;
+    background: var(--encre);
+    color: var(--sur-encre);
+    border-bottom-right-radius: 6px;
+  }
+  .attente {
+    background: transparent;
+    color: var(--encre);
+    border: 1px dashed var(--encre-douce);
+  }
+  .etat {
+    justify-self: end;
+    margin: 0 0 var(--e-2);
+  }
+
+  .scene {
+    position: relative;
+    height: 420px;
+    border-radius: var(--r-feuille);
+    overflow: hidden;
+    background: url('/images/vitre-clair.jpg') center / cover;
+    border: 1px solid var(--trait);
+  }
+  :root[data-theme='dark'] .scene {
+    background-image: url('/images/vitre-sombre.jpg');
+  }
+  .scene-contenu {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 24px 24px 120px;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+    scrollbar-width: none;
+  }
+  .scene-ligne {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--surface-haute) 82%, transparent);
+  }
+  .scene-barres {
+    display: grid;
+    gap: 6px;
+  }
+  .scene-barres span {
+    height: 9px;
+    width: 62%;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--encre) 70%, transparent);
+  }
+  .scene-barres span + span {
+    width: 40%;
+    background: color-mix(in srgb, var(--encre) 30%, transparent);
+  }
+  .onglets {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    width: min(92%, 380px);
+    padding: 6px;
+    border-radius: var(--r-pilule);
+  }
+  .onglet {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    height: 54px;
+    padding: 6px 0 0;
+    border: 0;
+    background: none;
+    color: var(--encre-douce);
+    font: 600 10.5px 'Commissioner', sans-serif;
+    cursor: pointer;
+    border-radius: var(--r-pilule);
+    transition: color var(--duree-courte);
+  }
+  .onglet[aria-current='page'] {
+    color: var(--encre);
+  }
+  .lentille {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    height: 54px;
+    border-radius: var(--r-pilule);
+    background: color-mix(in srgb, var(--encre) 10%, transparent);
+    box-shadow: inset 0 1px 0 var(--verre-trait), inset 0 0 0 1px color-mix(in srgb, var(--encre) 8%, transparent);
+    transition: transform 420ms var(--courbe-ressort), width var(--duree-moyenne) var(--courbe-standard), scale var(--duree-courte) var(--courbe-ressort);
+  }
+  .lentille.appui {
+    scale: 1.08 1.12;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    translate: -50% 140%;
+    padding: 12px 20px;
+    border-radius: var(--r-pilule);
+    background: var(--encre);
+    color: var(--sur-encre);
+    font: 600 14px 'Commissioner', sans-serif;
+    opacity: 0;
+    transition: translate var(--duree-moyenne) var(--courbe-entree), opacity var(--duree-courte);
+    z-index: 60;
+  }
+  .toast.visible {
+    translate: -50% 0;
+    opacity: 1;
+  }
+
+  @media (max-width: 760px) {
+    .grille-2 {
+      grid-template-columns: 1fr;
+    }
+    .echelle > div {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    .tete {
+      padding-top: 120px;
+    }
+  }
+</style>
