@@ -31,19 +31,27 @@ vec3 sharpAt(vec2 p) { return texture(uScene, coverUv(p)).rgb; }
 vec3 blurAt(vec2 p) { return texture(uSceneBlur, coverUv(p)).rgb; }
 // Lecture bilinéaire faite à la main : le filtrage des textures n'est pas
 // garanti identique sur tous les moteurs de rendu (Impeller, Skia, web).
-float mapAt(sampler2D m, vec2 p) {
+// (Le web n'accepte pas de sampler en paramètre : une fonction par carte.)
+vec2 mapBase(vec2 p, out vec2 f) {
   vec2 t = clamp(p / uSize, 0.0, 1.0) * uMapSize - 0.5;
   vec2 i = floor(t);
-  vec2 f = t - i;
-  vec2 px = 1.0 / uMapSize;
-  vec2 b = (i + 0.5) * px;
-  float a = texture(m, b).r;
-  float c = texture(m, b + vec2(px.x, 0.0)).r;
-  float d = texture(m, b + vec2(0.0, px.y)).r;
-  float e = texture(m, b + px).r;
-  return mix(mix(a, c, f.x), mix(d, e, f.x), f.y);
+  f = t - i;
+  return (i + 0.5) / uMapSize;
 }
-float heightAt(vec2 p) { return mapAt(uHeight, p); }
+float heightAt(vec2 p) {
+  vec2 f;
+  vec2 b = mapBase(p, f);
+  vec2 px = 1.0 / uMapSize;
+  return mix(mix(texture(uHeight, b).r, texture(uHeight, b + vec2(px.x, 0.0)).r, f.x),
+             mix(texture(uHeight, b + vec2(0.0, px.y)).r, texture(uHeight, b + px).r, f.x), f.y);
+}
+float clearAt(vec2 p) {
+  vec2 f;
+  vec2 b = mapBase(p, f);
+  vec2 px = 1.0 / uMapSize;
+  return mix(mix(texture(uClear, b).r, texture(uClear, b + vec2(px.x, 0.0)).r, f.x),
+             mix(texture(uClear, b + vec2(0.0, px.y)).r, texture(uClear, b + px).r, f.x), f.y);
+}
 
 void main() {
   vec2 p = FlutterFragCoord().xy;
@@ -60,7 +68,7 @@ void main() {
   vec3 N = normalize(vec3(-grad, 1.0));
 
   // --- La vitre : buée là où rien ne l'a essuyée -------------------------
-  float clearMask = mapAt(uClear, p);
+  float clearMask = clearAt(p);
   float fog = uFog * (1.0 - clearMask);
   vec3 fogTint = mix(vec3(0.94, 0.955, 0.97), vec3(0.58, 0.64, 0.70), uTheme);
   vec3 fogged = mix(blurAt(p), fogTint, mix(0.20, 0.12, uTheme));
