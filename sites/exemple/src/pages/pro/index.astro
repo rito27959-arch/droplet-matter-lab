@@ -1,0 +1,493 @@
+---
+// ============================================================================
+// PROTOTYPE — Droplet Pro, à la façon de Telegram Premium sur iOS.
+// ----------------------------------------------------------------------------
+// Trois écrans de l'app, dessinés dans un vrai téléphone pour être validés
+// AVANT d'être écrits en Flutter :
+//   1. la vitrine (emblème animé, offres, liste des avantages) ;
+//   2. la présentation d'un avantage (un téléphone par avantage, qu'on fait
+//      glisser ; chacun joue sa petite scène) ;
+//   3. le paiement Mobile Money (offre, opérateur, numéro, attente, succès).
+// Construction reprise de l'idée de Telegram (téléphone recadré en haut ou en
+// bas, glissement en perspective, points de page), mais rien n'est copié :
+// le code de Telegram iOS est sous GPL. Textes : ceux de l'app (app_fr.arb).
+// AUCUN PAIEMENT : rien n'est envoyé, le numéro ne quitte pas la page.
+// ============================================================================
+const avantages = [
+  { cle: 'vocaux', titre: 'Vocaux en texte', court: "Lire un vocal sans l'écouter", long: "La transcription se fait sur votre téléphone, hors ligne. Le vocal ne part nulle part, et vous le lisez en réunion, dans le bus, ou quand le réseau n'est pas là.", icone: 'onde' },
+  { cle: 'forme', titre: 'Mise en forme', court: 'Gras, italique, code, spoiler', long: "Un mot en gras, une ligne de code, un passage masqué qu'on découvre d'un toucher : votre message dit exactement ce que vous vouliez, et rien d'autre.", icone: 'texte' },
+  { cle: 'fonds', titre: 'Fonds et motifs', court: 'Toute la galerie, et les quatre packs', long: "Chaque fond est dessiné à la main. Droplet, Jeux, Maison, Jardin : votre écran de discussion ne ressemble à aucun autre.", icone: 'fond' },
+  { cle: 'traduction', titre: 'Traduction', court: "Comprendre sans quitter l'app", long: "Le message est traduit sur votre téléphone : son contenu ne part chez personne. L'original reste à un toucher, parce qu'une traduction n'est jamais tout à fait le texte.", icone: 'langue' },
+  { cle: 'autocollants', titre: 'Autocollants animés', court: 'La goutte Droplet, en mouvement', long: "Des autocollants dessinés pour Droplet, animés image par image, et légers : ils voyagent même par le maillage, sans Internet.", icone: 'etincelle' },
+  { cle: 'icones', titre: "Icônes d'app", court: "Changer l'icône sur l'écran d'accueil", long: "Une app de messagerie discrète, ça commence par son icône. Choisissez celle qui vous ressemble, ou celle qu'on remarque le moins.", icone: 'grille' },
+  { cle: 'badge', titre: 'Badge Pro', court: 'Il accompagne votre nom', long: "Il ne donne aucun pouvoir sur les autres. Il dit seulement que vous avez payé pour que Droplet reste sans publicité, sans abonnement obligatoire et sans revente de données.", icone: 'badge' },
+];
+// Le dégradé des avantages de l'app (fonctions_premium.dart).
+const palette = ['#6C51FF', '#8E4FFF', '#B44BF0', '#E151B0', '#F2586B', '#F97C3C', '#FFA932'];
+const icones: Record<string, string> = {
+  onde: '<path d="M4 12h1M8 8v8M12 5v14M16 9v6M20 11v2" stroke-linecap="round"/>',
+  texte: '<path d="M5 6h14M12 6v13M8 19h8" stroke-linecap="round"/>',
+  fond: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 15l5-5 4 4 3-3 4 4" stroke-linejoin="round"/>',
+  langue: '<path d="M4 6h9M8.5 4v2M6 6c1 4 3 6 6 7M11 6c-1 4-3 6-6 7M13 20l4-9 4 9M14.5 17h5" stroke-linecap="round" stroke-linejoin="round"/>',
+  etincelle: '<path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" stroke-linejoin="round"/>',
+  grille: '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
+  badge: '<path d="M12 3l2.4 1.6 2.9-.2.9 2.8 2.3 1.8-1 2.7 1 2.7-2.3 1.8-.9 2.8-2.9-.2L12 21l-2.4-1.6-2.9.2-.9-2.8-2.3-1.8 1-2.7-1-2.7 2.3-1.8.9-2.8 2.9.2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6" stroke-linecap="round" stroke-linejoin="round"/>',
+};
+---
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Droplet Pro — prototype</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/fonts/commissioner.woff2" as="font" type="font/woff2" crossorigin />
+</head>
+<body>
+  <div class="scene">
+    <div class="appareil" id="appareil">
+      <div class="ilot" aria-hidden="true"></div>
+      <div class="ecran" id="ecran">
+
+        <!-- ═══ 1. LA VITRINE ═══ -->
+        <header class="nav" id="nav">
+          <button class="rond" type="button" aria-label="Retour"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <p class="nav__titre">Droplet Pro</p>
+          <span class="rond rond--vide"></span>
+        </header>
+
+        <div class="defile" id="defile">
+          <section class="heros">
+            <canvas class="heros__etoiles" id="etoiles" aria-hidden="true"></canvas>
+            <div class="embleme" aria-hidden="true">
+              <svg viewBox="0 0 120 140">
+                <defs>
+                  <linearGradient id="g-goutte" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#8E7BFF" /><stop offset="0.5" stop-color="#E151B0" /><stop offset="1" stop-color="#FFA932" />
+                  </linearGradient>
+                  <radialGradient id="g-reflet" cx="0.35" cy="0.3" r="0.6">
+                    <stop offset="0" stop-color="#fff" stop-opacity="0.85" /><stop offset="0.35" stop-color="#fff" stop-opacity="0.12" /><stop offset="1" stop-color="#fff" stop-opacity="0" />
+                  </radialGradient>
+                </defs>
+                <path d="M60 6C60 6 16 58 16 88a44 44 0 0 0 88 0C104 58 60 6 60 6z" fill="url(#g-goutte)" />
+                <path d="M60 6C60 6 16 58 16 88a44 44 0 0 0 88 0C104 58 60 6 60 6z" fill="url(#g-reflet)" />
+                <path d="M44 74c-4 8-4 18 2 25" stroke="#fff" stroke-opacity="0.7" stroke-width="5" stroke-linecap="round" fill="none" />
+              </svg>
+            </div>
+            <h1>Droplet Pro</h1>
+            <p class="heros__texte">Vos vocaux en texte, la traduction, les autocollants animés, toute la galerie. Payé une fois, à vous pour toujours.</p>
+            <ul class="garanties">
+              <li>Paiement unique</li><li>Sans abonnement</li><li>Marche hors ligne</li>
+            </ul>
+          </section>
+
+          <ul class="offres groupe" role="radiogroup" aria-label="Offre">
+            <li><button class="offre" type="button" role="radio" aria-checked="true" data-offre="pro" data-prix="1 000">
+              <span class="radio"></span>
+              <span class="offre__nom"><b>Droplet Pro</b><small>une fois, à vie</small></span>
+              <span class="pastille">Le plus complet</span>
+              <span class="offre__prix">1 000 F</span>
+            </button></li>
+            <li><button class="offre" type="button" role="radio" aria-checked="false" data-offre="pack" data-prix="500">
+              <span class="radio"></span>
+              <span class="offre__nom"><b>Le pack</b><small>une fois · dix icônes, huit fonds</small></span>
+              <span class="offre__prix">500 F</span>
+            </button></li>
+          </ul>
+
+          <h2 class="intertitre">Ce que Pro apporte</h2>
+          <ul class="groupe avantages">
+            {avantages.map((a, i) => (
+              <li><button class="avantage" type="button" data-page={i}>
+                <span class="carre" style={`--c:${palette[i]}`}><svg viewBox="0 0 24 24" set:html={icones[a.icone]} /></span>
+                <span class="avantage__txt"><b>{a.titre}</b><small>{a.court}</small></span>
+                <svg class="chevron" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+              </button></li>
+            ))}
+          </ul>
+
+          <section class="jamais">
+            <h2>Ce que Droplet<br />ne demandera jamais</h2>
+            <p>Ni publicité, ni abonnement obligatoire, ni revente de vos données — il n'y a même pas de serveur pour les recueillir. Le pack et Pro financent le reste.</p>
+          </section>
+          <div class="reserve"></div>
+        </div>
+
+        <footer class="achat">
+          <button class="cta" type="button" id="cta"><span>Débloquer pour <b id="cta-prix">1 000</b> F</span><i class="cta__reflet"></i></button>
+          <p class="achat__note">Payé une fois par Mobile Money · aucun prélèvement ensuite</p>
+          <button class="lien" type="button">Déjà payé ? Restaurer</button>
+        </footer>
+
+        <!-- ═══ 2. LA PRÉSENTATION DES AVANTAGES ═══ -->
+        <div class="voile" id="voile" hidden></div>
+        <section class="feuille feuille--demo" id="demo" aria-hidden="true" aria-label="Avantages de Droplet Pro">
+          <div class="demo__scene" id="demo-scene">
+            <canvas class="demo__deco" id="deco" aria-hidden="true"></canvas>
+            <div class="demo__piste" id="piste">
+              {avantages.map((a, i) => (
+                <div class="page" data-i={i}>
+                  <div class={`tel ${i % 2 ? 'tel--bas' : 'tel--haut'}`}>
+                    <div class="tel__ecran">
+                      <div class={`scenario scenario--${a.cle}`}>
+                        {a.cle === 'vocaux' && (
+                          <div class="fil">
+                            <div class="bulle bulle--recu vocal"><span class="lecture"></span><span class="onde">{Array.from({ length: 22 }, (_, k) => <i style={`--h:${0.25 + Math.abs(Math.sin(k * 1.7)) * 0.75}`}></i>)}</span><span class="duree">0:14</span><span class="aA">→A</span></div>
+                            <div class="transcription">« Je suis devant la gare, il pleut, je t'attends sous l'abri bleu. Prends un parapluie ! »</div>
+                          </div>
+                        )}
+                        {a.cle === 'forme' && (
+                          <div class="fil">
+                            <div class="bulle bulle--envoye forme">Rendez-vous <b>demain 9 h</b>, <em>pas avant</em>. Le code du portail : <code>4F2A</code>. Et la surprise : <span class="spoiler"><span>un gâteau</span></span></div>
+                          </div>
+                        )}
+                        {a.cle === 'fonds' && (
+                          <div class="fil fil--fond">
+                            <div class="bulle bulle--recu">On essaie le nouveau fond ?</div>
+                            <div class="bulle bulle--envoye">Il change à chaque fois 😄</div>
+                          </div>
+                        )}
+                        {a.cle === 'traduction' && (
+                          <div class="fil">
+                            <div class="bulle bulle--recu trad">See you at the station at nine, bring an umbrella!<span class="trad__fr">On se voit à la gare à neuf heures, prends un parapluie !</span><span class="trad__etiquette">Traduit de l'anglais</span></div>
+                          </div>
+                        )}
+                        {a.cle === 'autocollants' && (
+                          <div class="fil fil--centre">
+                            <svg class="goutte-anim" viewBox="0 0 120 140"><path d="M60 8C60 8 18 58 18 88a42 42 0 0 0 84 0C102 58 60 8 60 8z" fill="#3E9BFF"/><circle cx="46" cy="86" r="7" fill="#fff"/><circle cx="74" cy="86" r="7" fill="#fff"/><circle cx="47" cy="87" r="3.4" fill="#10203a"/><circle cx="75" cy="87" r="3.4" fill="#10203a"/><path d="M50 104q10 9 20 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/></svg>
+                          </div>
+                        )}
+                        {a.cle === 'icones' && (
+                          <div class="accueil-tel">
+                            {Array.from({ length: 11 }, (_, k) => <i class="app-ic" style={`--k:${k}`}></i>)}
+                            <i class="app-ic app-ic--droplet"><b></b></i>
+                          </div>
+                        )}
+                        {a.cle === 'badge' && (
+                          <div class="profil">
+                            <span class="profil__avatar">A</span>
+                            <p class="profil__nom">Amina <span class="badge-pro"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 1.6 2.9-.2.9 2.8 2.3 1.8-1 2.7 1 2.7-2.3 1.8-.9 2.8-2.9-.2L12 21l-2.4-1.6-2.9.2-.9-2.8-2.3-1.8 1-2.7-1-2.7 2.3-1.8.9-2.8 2.9.2z"/><path d="M8.5 12l2.3 2.3 4.7-4.6" stroke="#fff" fill="none" stroke-width="2" stroke-linecap="round"/></svg></span></p>
+                            <p class="profil__etat">en ligne · à portée</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <i class="tel__reflet"></i>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button class="rond rond--fermer" type="button" id="demo-fermer" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+          </div>
+          <div class="points" id="points">{avantages.map(() => <i></i>)}</div>
+          <div class="demo__texte">
+            <h3 id="demo-titre"></h3>
+            <p id="demo-long"></p>
+          </div>
+          <div class="demo__bas">
+            <button class="cta" type="button" data-payer><span>Débloquer pour <b class="prix-courant">1 000</b> F</span><i class="cta__reflet"></i></button>
+          </div>
+        </section>
+
+        <!-- ═══ 3. LE PAIEMENT ═══ -->
+        <section class="feuille feuille--paiement" id="paiement" aria-hidden="true" aria-label="Paiement Mobile Money">
+          <div class="poignee"></div>
+          <button class="rond rond--fermer rond--clair" type="button" id="paiement-fermer" aria-label="Fermer"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+
+          <div class="etape" data-etape="saisie">
+            <p class="recap"><span id="recap-nom">Droplet Pro</span> · <span id="recap-duree">une fois, à vie</span></p>
+            <p class="montant"><b id="montant">1 000</b> F</p>
+            <h3 class="etape__titre">Payer maintenant</h3>
+            <p class="etape__aide">MTN Mobile Money ou Orange Money, depuis ce téléphone ou un autre.</p>
+            <div class="operateurs" role="radiogroup" aria-label="Opérateur">
+              <button type="button" role="radio" aria-checked="true" data-op="mtn" style="--op:#FFCC00;--encre:#1A1400">MTN MoMo</button>
+              <button type="button" role="radio" aria-checked="false" data-op="orange" style="--op:#FF7900;--encre:#fff">Orange Money</button>
+            </div>
+            <label class="champ">
+              <span class="champ__indicatif">+237</span>
+              <input id="numero" inputmode="numeric" autocomplete="off" placeholder="6XX XX XX XX" maxlength="12" aria-label="Numéro qui va payer (9 chiffres)" />
+            </label>
+            <p class="etape__aide etape__aide--petit">Entrez le numéro qui va payer (9 chiffres). Prototype : rien n'est envoyé.</p>
+            <button class="cta" type="button" id="payer" disabled><span>Payer <b class="prix-courant">1 000</b> F</span><i class="cta__reflet"></i></button>
+            <details class="main">
+              <summary>Ou payer à la main</summary>
+              <p>Si l'invite n'arrive pas sur votre téléphone, ou si vous préférez envoyer l'argent vous-même : composez <code id="code-op">*126#</code>, puis envoyez le montant au numéro Droplet affiché dans l'app.</p>
+            </details>
+          </div>
+
+          <div class="etape" data-etape="attente" hidden>
+            <div class="sonnerie" aria-hidden="true"><span></span><span></span><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2" stroke-linecap="round"/></svg></div>
+            <h3 class="etape__titre">Validez sur votre téléphone</h3>
+            <p class="etape__aide">Composez votre code Mobile Money quand l'invite s'affiche.</p>
+            <p class="attente"><span class="roue"></span> En attente de votre code…</p>
+          </div>
+
+          <div class="etape" data-etape="succes" hidden>
+            <canvas class="bouquet" id="bouquet" aria-hidden="true"></canvas>
+            <div class="embleme embleme--petit" aria-hidden="true"><svg viewBox="0 0 120 140"><path d="M60 6C60 6 16 58 16 88a44 44 0 0 0 88 0C104 58 60 6 60 6z" fill="url(#g-goutte)" /><path d="M60 6C60 6 16 58 16 88a44 44 0 0 0 88 0C104 58 60 6 60 6z" fill="url(#g-reflet)" /></svg></div>
+            <h3 class="etape__titre" id="succes-titre">Droplet Pro activé</h3>
+            <p class="etape__aide" id="succes-texte">Le badge Pro accompagne votre nom, et toutes les icônes et tous les fonds vous sont ouverts.</p>
+            <button class="cta" type="button" id="termine"><span>Terminé</span><i class="cta__reflet"></i></button>
+          </div>
+        </section>
+      </div>
+    </div>
+    <aside class="note">
+      <b>Prototype de l'écran Droplet Pro</b>
+      <span>Touchez un avantage, faites glisser les téléphones, puis « Débloquer ». Aucun paiement réel : rien n'est envoyé.</span>
+    </aside>
+  </div>
+
+  <script id="donnees" type="application/json" set:html={JSON.stringify({ avantages, palette })}></script>
+  <script>
+    import '../../scripts/pro';
+  </script>
+</body>
+</html>
+
+<style is:global>
+  @font-face { font-family: 'Commissioner'; src: url('/fonts/commissioner.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+  @font-face { font-family: 'Martian Mono'; src: url('/fonts/martian-mono.woff2') format('woff2'); font-weight: 100 800; font-display: swap; }
+  :root { color-scheme: dark; --sortie: cubic-bezier(0.23, 1, 0.32, 1); --ressort: cubic-bezier(0.34, 1.4, 0.5, 1); --accent: #0A84FF; --grad: linear-gradient(90deg, #6C51FF, #B44BF0 20%, #F2586B 38%, #FFA932 50%, #F2586B 62%, #B44BF0 80%, #6C51FF); }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; background: #0b0b0d; }
+  body { font-family: 'Commissioner', system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  svg { display: block; }
+
+  /* ── Le téléphone ─────────────────────────────────────────── */
+  .scene { min-height: 100%; display: grid; grid-template-columns: auto minmax(0, 280px); gap: 48px; align-items: center; justify-content: center; padding: 32px; }
+  .appareil { position: relative; width: 402px; height: 874px; padding: 11px; border-radius: 64px; background: #1a1a1c; box-shadow: inset 0 0 0 2px #3a3a3e, inset 0 0 0 5px #0d0d0f, 0 40px 80px -30px rgb(0 0 0 / 0.8); }
+  .ilot { position: absolute; z-index: 30; top: 22px; left: 50%; width: 120px; height: 34px; margin-left: -60px; border-radius: 20px; background: #000; }
+  .ecran { position: relative; width: 100%; height: 100%; border-radius: 54px; overflow: hidden; background: #000; isolation: isolate; }
+  .note { display: grid; gap: 8px; color: #8d8d93; font-size: 14px; line-height: 1.5; }
+  .note b { color: #fff; font-size: 16px; }
+  @media (max-width: 760px) {
+    .scene { display: block; padding: 0; }
+    .appareil { width: 100%; height: 100dvh; padding: 0; border-radius: 0; box-shadow: none; background: #000; }
+    .ilot, .note { display: none; }
+    .ecran { border-radius: 0; }
+  }
+
+  /* ── La barre du haut : le titre apparaît quand l'emblème passe dessous ── */
+  .nav { position: absolute; z-index: 5; inset: 0 0 auto 0; display: flex; align-items: center; justify-content: space-between; padding: 58px 16px 10px; transition: background-color 200ms; }
+  .nav.est-defilee { background: rgb(0 0 0 / 0.88); backdrop-filter: blur(20px); box-shadow: 0 0.5px 0 rgb(255 255 255 / 0.12); }
+  .nav__titre { margin: 0; font-weight: 650; font-size: 17px; opacity: 0; transform: translateY(6px); transition: opacity 200ms, transform 300ms var(--sortie); }
+  .nav.est-defilee .nav__titre { opacity: 1; transform: none; }
+  @media (max-width: 760px) { .nav { padding-top: max(14px, env(safe-area-inset-top)); } }
+
+  /* Le rond de verre : gonfle sous le doigt (BoutonVerre de l'app). */
+  .rond { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 0.12); box-shadow: inset 0 0.5px 0 rgb(255 255 255 / 0.35); backdrop-filter: blur(14px); transition: transform 220ms var(--ressort), background-color 150ms; }
+  .rond:active { transform: scale(1.12); background: rgb(255 255 255 / 0.2); }
+  .rond svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .rond--vide { visibility: hidden; }
+
+  .defile { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 16px; scrollbar-width: none; }
+  .defile::-webkit-scrollbar { display: none; }
+
+  /* ── 1. Le héros : l'emblème dans un tourbillon d'étoiles ── */
+  .heros { position: relative; text-align: center; padding-top: 96px; }
+  .heros__etoiles { position: absolute; left: 50%; top: 40px; width: 380px; height: 240px; margin-left: -190px; pointer-events: none; }
+  .embleme { position: relative; width: 112px; height: 130px; margin: 0 auto; filter: drop-shadow(0 18px 40px rgb(225 81 176 / 0.45)); animation: flotte 4.5s ease-in-out infinite; }
+  .embleme svg { width: 100%; height: 100%; }
+  @keyframes flotte { 50% { transform: translateY(-6px) rotate(-2deg); } }
+  .heros h1 { margin: 22px 0 8px; font-size: 30px; font-weight: 720; letter-spacing: -0.02em; font-variation-settings: 'FLAR' 70, 'VOLM' 30; }
+  .heros__texte { margin: 0 auto; max-width: 31ch; color: #aeaeb2; font-size: 15.5px; line-height: 1.42; }
+  .garanties { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; padding: 0; margin: 18px 0 26px; }
+  .garanties li { padding: 5px 10px; border-radius: 99px; background: rgb(255 255 255 / 0.08); color: #d1d1d6; font-size: 12.5px; font-weight: 550; }
+
+  /* ── Les listes groupées, comme les réglages d'iOS ── */
+  .groupe { list-style: none; margin: 0; padding: 0; border-radius: 16px; background: #1c1c1e; overflow: hidden; }
+  .groupe li + li > * { box-shadow: inset 0 0.5px 0 rgb(84 84 88 / 0.65); }
+  .avantages li + li > * { box-shadow: none; }
+  .avantages li + li .avantage__txt { box-shadow: inset 0 0.5px 0 rgb(84 84 88 / 0.65); }
+
+  .offre { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-align: left; transition: background-color 120ms; }
+  .offre:active, .avantage:active { background: rgb(255 255 255 / 0.06); }
+  .radio { flex: none; width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px #545458; transition: box-shadow 200ms var(--sortie); }
+  .offre[aria-checked='true'] .radio { box-shadow: inset 0 0 0 7px var(--accent); }
+  .offre__nom { flex: 1; display: grid; }
+  .offre__nom b { font-weight: 600; font-size: 16.5px; }
+  .offre__nom small { color: #8d8d93; font-size: 13.5px; }
+  .pastille { padding: 3px 8px; border-radius: 99px; background: var(--accent); font-size: 11.5px; font-weight: 700; }
+  .offre__prix { font-weight: 650; font-size: 16.5px; font-variant-numeric: tabular-nums; }
+
+  .intertitre { margin: 28px 16px 8px; color: #8d8d93; font-size: 13px; font-weight: 500; }
+  .avantage { width: 100%; display: flex; align-items: center; gap: 14px; padding: 0 0 0 16px; text-align: left; }
+  .carre { flex: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; background: var(--c); }
+  .carre svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2; }
+  .avantage__txt { flex: 1; display: grid; padding: 11px 0; }
+  .avantage__txt b { font-weight: 550; font-size: 16.5px; }
+  .avantage__txt small { color: #8d8d93; font-size: 13.5px; }
+  .chevron { width: 16px; height: 16px; margin-right: 14px; fill: none; stroke: #5a5a5e; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+  .jamais { margin: 30px 8px 0; text-align: center; }
+  .jamais h2 { margin: 0 0 8px; font-size: 19px; font-weight: 680; letter-spacing: -0.01em; }
+  .jamais p { margin: 0; color: #8d8d93; font-size: 14px; line-height: 1.45; }
+  .reserve { height: 190px; }
+
+  /* ── La barre d'achat ── */
+  .achat { position: absolute; z-index: 4; inset: auto 0 0 0; padding: 14px 16px 30px; background: linear-gradient(transparent, #000 26%); text-align: center; }
+  .achat__note { margin: 9px 0 2px; color: #8d8d93; font-size: 12.5px; }
+  .lien { color: var(--accent); font-size: 15px; padding: 8px; }
+  .cta { position: relative; width: 100%; height: 54px; border-radius: 27px; overflow: hidden; background: var(--grad); background-size: 200% 100%; font-size: 17px; font-weight: 700; box-shadow: inset 0 0.5px 0 rgb(255 255 255 / 0.5), 0 10px 24px -10px rgb(180 75 240 / 0.7); transition: transform 240ms var(--ressort), filter 150ms; animation: degrade 6s linear infinite; }
+  .cta b { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .cta:active { transform: scale(1.03); filter: brightness(1.12); }
+  .cta:disabled { background: #2c2c2e; color: #636366; box-shadow: none; animation: none; }
+  .cta:disabled .cta__reflet { display: none; }
+  @keyframes degrade { to { background-position: 200% 0; } }
+  .cta__reflet { position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.28) 45%, transparent 60%); transform: translateX(-100%); animation: reflet 3.6s 1s ease-in-out infinite; }
+  @keyframes reflet { 40%, 100% { transform: translateX(100%); } }
+
+  /* ── Les feuilles ── */
+  .voile { position: absolute; z-index: 10; inset: 0; background: rgb(0 0 0 / 0.5); opacity: 0; transition: opacity 300ms; }
+  .voile.ouvert { opacity: 1; }
+  .feuille { position: absolute; z-index: 11; inset: auto 0 0 0; border-radius: 28px 28px 0 0; background: #1c1c1e; transform: translateY(105%); transition: transform 520ms var(--sortie); }
+  .feuille.ouverte { transform: none; }
+
+  /* ── 2. La présentation : les téléphones qui glissent ── */
+  .feuille--demo { top: 54px; display: flex; flex-direction: column; overflow: hidden; }
+  .demo__scene { position: relative; height: 58%; overflow: hidden; touch-action: pan-y; }
+  .demo__deco { position: absolute; inset: 0; width: 100%; height: 100%; transition: background-color 400ms; }
+  .demo__piste { position: absolute; inset: 0; perspective: 900px; }
+  .page { position: absolute; inset: 0; }
+  .rond--fermer { position: absolute; z-index: 3; top: 14px; right: 14px; width: 32px; height: 32px; }
+  .rond--fermer svg { width: 15px; height: 15px; }
+  .rond--clair { background: rgb(255 255 255 / 0.1); }
+
+  /* Le téléphone d'un avantage : recadré, coupé par le bord de la scène,
+     tantôt par le haut, tantôt par le bas (l'idée de Telegram). */
+  .tel { position: absolute; left: 50%; width: 250px; height: 516px; margin-left: -125px; padding: 9px; border-radius: 40px; background: #0d0d0f; box-shadow: inset 0 0 0 1.5px #4a4a50, 0 30px 60px -20px rgb(0 0 0 / 0.7); transform-style: preserve-3d; will-change: transform; }
+  .tel--haut { top: 46px; }
+  .tel--bas { bottom: 46px; }
+  .tel::before { content: ''; position: absolute; z-index: 2; top: 18px; left: 50%; width: 66px; height: 20px; margin-left: -33px; border-radius: 12px; background: #000; }
+  .tel__ecran { position: relative; height: 100%; border-radius: 32px; overflow: hidden; background: #0b0b0c; }
+  .tel__reflet { position: absolute; inset: 0; border-radius: 40px; pointer-events: none; background: linear-gradient(115deg, rgb(255 255 255 / 0.10), transparent 32%); }
+
+  .points { display: flex; justify-content: center; gap: 7px; padding: 14px 0 4px; }
+  .points i { width: 7px; height: 7px; border-radius: 4px; background: #48484a; transition: width 300ms var(--sortie), background-color 300ms; }
+  .points i.actif { width: 18px; background: #fff; }
+  .demo__texte { flex: 1; padding: 8px 26px 0; text-align: center; }
+  .demo__texte h3 { margin: 6px 0 8px; font-size: 21px; font-weight: 700; letter-spacing: -0.01em; font-variation-settings: 'FLAR' 50; }
+  .demo__texte p { margin: 0; color: #aeaeb2; font-size: 15px; line-height: 1.42; }
+  .demo__texte.change { animation: change 360ms var(--sortie); }
+  @keyframes change { from { opacity: 0; transform: translateY(6px); } }
+  .demo__bas { padding: 10px 16px 30px; }
+
+  /* ── Les petites scènes dans les téléphones ── */
+  .scenario { position: absolute; inset: 0; }
+  /* Le contenu se place dans la partie VISIBLE du téléphone : en haut quand
+     il est coupé par le bas, en bas quand il est coupé par le haut. */
+  .fil { position: absolute; inset: 52px 10px 16px; display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; font-size: 13px; line-height: 1.35; }
+  .tel--haut .fil { padding-top: 40px; }
+  .tel--bas .fil { justify-content: flex-end; padding-bottom: 30px; }
+  .bulle { max-width: 86%; padding: 7px 10px; border-radius: 16px; opacity: 0; transform: translateY(10px) scale(0.96); }
+  .bulle--recu { align-self: flex-start; background: #262628; border-bottom-left-radius: 5px; }
+  .bulle--envoye { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 5px; }
+  .page.joue .bulle { animation: bulle 420ms var(--ressort) forwards; }
+  .page.joue .bulle + .bulle { animation-delay: 500ms; }
+  @keyframes bulle { to { opacity: 1; transform: none; } }
+
+  .vocal { display: flex; align-items: center; gap: 7px; min-width: 190px; }
+  .lecture { width: 24px; height: 24px; border-radius: 50%; background: var(--accent); flex: none; }
+  .onde { flex: 1; display: flex; align-items: center; gap: 2px; height: 22px; }
+  .onde i { flex: 1; height: calc(var(--h) * 100%); border-radius: 2px; background: #6b6b70; }
+  .page.joue .onde i { animation: onde 2.4s 0.6s steps(1) forwards; }
+  .onde i:nth-child(n) { animation-delay: calc(0.6s + var(--h) * 0s); }
+  @keyframes onde { to { background: #fff; } }
+  .duree { color: #8d8d93; font-size: 11px; }
+  .aA { padding: 2px 5px; border-radius: 6px; background: rgb(255 255 255 / 0.12); font-size: 10.5px; font-weight: 700; }
+  .page.joue .aA { animation: appuie 500ms 1.4s; }
+  @keyframes appuie { 50% { transform: scale(0.85); background: var(--accent); } }
+  .transcription { align-self: flex-start; max-width: 86%; padding: 0 10px; color: #d1d1d6; font-style: italic; clip-path: inset(0 100% 0 0); }
+  .page.joue .transcription { animation: dactylo 2.2s 1.8s steps(40) forwards; }
+  @keyframes dactylo { to { clip-path: inset(0 0 0 0); } }
+
+  .forme code { font-family: 'Martian Mono', monospace; font-size: 11.5px; padding: 0 4px; border-radius: 4px; background: rgb(0 0 0 / 0.25); }
+  .spoiler { position: relative; display: inline-block; border-radius: 4px; }
+  .spoiler span { opacity: 0; }
+  .spoiler::after { content: ''; position: absolute; inset: 0; border-radius: 4px; background: radial-gradient(circle, rgb(255 255 255 / 0.9) 0.6px, transparent 1.2px) 0 0 / 5px 5px, rgb(255 255 255 / 0.18); animation: grain 0.6s steps(3) infinite; }
+  .page.joue .spoiler span { animation: revele 400ms 2.4s forwards; }
+  .page.joue .spoiler::after { animation: grain 0.6s steps(3) infinite, efface 600ms 2.2s forwards; }
+  @keyframes grain { 50% { background-position: 2px 3px, 0 0; } }
+  @keyframes efface { to { opacity: 0; transform: scale(1.15); } }
+  @keyframes revele { to { opacity: 1; } }
+
+  .fil--fond { background: #0e1a2e; transition: background 600ms; }
+  .page.joue .fil--fond { animation: fonds 6s 0.5s infinite; }
+  @keyframes fonds {
+    0%, 100% { background: radial-gradient(circle at 30% 20%, #2d3f8f, #0e1a2e 70%); }
+    33% { background: radial-gradient(circle at 70% 30%, #6b2f7f, #1a0e24 70%); }
+    66% { background: radial-gradient(circle at 40% 80%, #1f6f5c, #0a1f1a 70%); }
+  }
+  .fil--fond { inset: 0; padding: 52px 10px 14px; }
+
+  .trad { display: grid; gap: 4px; }
+  .trad__fr { color: #fff; max-height: 0; overflow: hidden; opacity: 0; border-top: 0.5px solid transparent; }
+  .trad__etiquette { color: #8d8d93; font-size: 10.5px; opacity: 0; }
+  .page.joue .trad__fr { animation: deplie 600ms 1.4s var(--sortie) forwards; }
+  .page.joue .trad__etiquette { animation: revele 300ms 1.9s forwards; }
+  @keyframes deplie { to { max-height: 60px; opacity: 1; padding-top: 4px; border-top-color: rgb(255 255 255 / 0.15); } }
+
+  .fil--centre { align-items: center; justify-content: center !important; }
+  .goutte-anim { width: 120px; height: 140px; transform-origin: 50% 100%; }
+  .page.joue .goutte-anim { animation: saute 1.6s var(--ressort) infinite; }
+  @keyframes saute { 0%, 100% { transform: scale(1, 1); } 15% { transform: scale(1.12, 0.86); } 40% { transform: translateY(-38px) scale(0.92, 1.1); } 65% { transform: scale(1.08, 0.92); } }
+
+  .accueil-tel { position: absolute; inset: 96px 14px 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; align-content: start; }
+  .tel--bas .accueil-tel { inset: auto 14px 44px; }
+  .app-ic { aspect-ratio: 1; border-radius: 12px; background: hsl(calc(var(--k) * 33) 45% 42%); opacity: 0.55; }
+  .app-ic--droplet { position: relative; opacity: 1; background: #0A84FF; }
+  .app-ic--droplet b { position: absolute; inset: 22%; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #fff; }
+  .page.joue .app-ic--droplet { animation: icones 4s 0.6s infinite; }
+  @keyframes icones { 0%, 22% { background: #0A84FF; } 25%, 47% { background: #111; transform: scale(0.9); } 50%, 72% { background: linear-gradient(135deg, #FFA932, #E151B0); transform: none; } 75%, 97% { background: #f2f2f7; } }
+
+  .profil { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 6px; background: linear-gradient(#1b1640, #0b0b0c 60%); }
+  .profil__avatar { width: 84px; height: 84px; display: grid; place-items: center; border-radius: 50%; background: #E59A4C; font-size: 34px; font-weight: 600; }
+  .profil__nom { margin: 8px 0 0; display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 650; }
+  .profil__etat { margin: 0; color: #8d8d93; font-size: 12.5px; }
+  .badge-pro svg { width: 20px; height: 20px; fill: #8E4FFF; transform: scale(0); }
+  .page.joue .badge-pro svg { animation: badge 700ms 0.8s var(--ressort) forwards; }
+  @keyframes badge { to { transform: scale(1) rotate(360deg); } }
+
+  /* ── 3. Le paiement ── */
+  .feuille--paiement { padding: 10px 20px 34px; background: #1c1c1e; }
+  .poignee { width: 36px; height: 5px; margin: 0 auto 10px; border-radius: 3px; background: #48484a; }
+  .feuille--paiement .rond--fermer { top: 16px; right: 16px; }
+  .etape { display: grid; gap: 12px; text-align: center; animation: change 420ms var(--sortie); }
+  .recap { margin: 18px 0 0; color: #8d8d93; font-size: 14px; }
+  .montant { margin: -6px 0 6px; font-size: 44px; font-weight: 720; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; font-variation-settings: 'FLAR' 60; }
+  .etape__titre { margin: 0; font-size: 20px; font-weight: 700; }
+  .etape__aide { margin: -4px 0 0; color: #aeaeb2; font-size: 14.5px; line-height: 1.4; }
+  .etape__aide--petit { font-size: 12.5px; color: #8d8d93; }
+  .operateurs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+  .operateurs button { height: 46px; border-radius: 14px; background: #2c2c2e; font-weight: 650; transition: background-color 200ms, color 200ms, transform 220ms var(--ressort); }
+  .operateurs button:active { transform: scale(1.04); }
+  .operateurs [aria-checked='true'] { background: var(--op); color: var(--encre); }
+  .champ { display: flex; align-items: center; height: 52px; border-radius: 14px; background: #2c2c2e; overflow: hidden; }
+  .champ__indicatif { padding: 0 12px 0 16px; color: #8d8d93; font-weight: 600; border-right: 0.5px solid #48484a; }
+  .champ input { flex: 1; min-width: 0; height: 100%; padding: 0 14px; border: 0; outline: 0; background: none; color: #fff; font: 600 18px 'Martian Mono', monospace; letter-spacing: 0.02em; }
+  .main { margin-top: 2px; text-align: left; color: #aeaeb2; font-size: 14px; }
+  .main summary { text-align: center; color: var(--accent); cursor: pointer; list-style: none; padding: 6px; }
+  .main code { font-family: 'Martian Mono', monospace; color: #fff; }
+
+  .sonnerie { position: relative; width: 120px; height: 120px; margin: 26px auto 8px; display: grid; place-items: center; }
+  .sonnerie svg { width: 46px; height: 46px; fill: none; stroke: #fff; stroke-width: 1.6; animation: vibre 1.2s infinite; }
+  .sonnerie span { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--accent); animation: onde-ronde 1.8s var(--sortie) infinite; }
+  .sonnerie span + span { animation-delay: 0.9s; }
+  @keyframes onde-ronde { from { transform: scale(0.45); opacity: 1; } to { transform: scale(1.1); opacity: 0; } }
+  @keyframes vibre { 0%, 40%, 100% { transform: none; } 5%, 15%, 25% { transform: rotate(-9deg); } 10%, 20%, 30% { transform: rotate(9deg); } }
+  .attente { display: flex; align-items: center; justify-content: center; gap: 8px; color: #8d8d93; font-size: 14px; margin: 10px 0 30px; }
+  .roue { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #48484a; border-top-color: #fff; animation: tourne 0.8s linear infinite; }
+  @keyframes tourne { to { transform: rotate(1turn); } }
+  .bouquet { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .embleme--petit { width: 84px; height: 98px; margin: 30px auto 6px; animation: eclot 800ms var(--ressort); }
+  @keyframes eclot { from { transform: scale(0.2) rotate(-30deg); opacity: 0; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+  }
+</style>
