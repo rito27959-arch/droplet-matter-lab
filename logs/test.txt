@@ -1,0 +1,24 @@
+== packages/droplet_core
+== packages/droplet_glass
+
+::group::✅ Passing tests
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/rain_test.dart: deux gouttes qui se touchent fusionnent en conservant le volume
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/rain_test.dart: une petite goutte adhère, une grosse glisse et laisse une traînée
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/logic_test.dart: Uniformes chaque shader déclare l'en-tête commun puis ses propres uniformes
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/rain_test.dart: le doigt ramasse l'eau sur son passage
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/logic_test.dart: Ressorts le ressort 2D atteint sa cible et s'y arrête
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/logic_test.dart: Ressorts une image très lente ne fait pas diverger le ressort
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/logic_test.dart: Qualité et formes la baisse automatique descend d'un cran jusqu'à LOW
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/logic_test.dart: Qualité et formes le cycle des formes tourne sur quatre formes
+✅ /home/runner/work/droplet-matter-lab/droplet-matter-lab/packages/droplet_glass/test/rain_test.dart: la pluie ne dépasse jamais le nombre maximal de gouttes
+::endgroup::
+
+🎉 9 tests passed.
+== packages/droplet_ui
+== sample
+
+::group::✅ Passing tests
+✅ l'accueil liste les huit expériences
+::endgroup::
+
+🎉 1 test passed.

@@ -1,0 +1,23 @@
+out/captures/00-accueil-sombre.png
+out/captures/01-surface-sombre.png
+out/captures/02-morph-sombre.png
+out/captures/03-aether-sombre.png
+out/captures/04-morph-prismatique-sombre.png
+out/captures/05-interactive-sombre.png
+out/captures/06-signature-sombre.png
+out/captures/06-signature-balanced-sombre.png
+out/captures/01-surface-low-sombre.png
+out/captures/07-pluie-sombre.png
+out/captures/08-barre-liquide-sombre.png
+out/captures/00-accueil-clair.png
+out/captures/01-surface-clair.png
+out/captures/02-morph-clair.png
+out/captures/03-aether-clair.png
+out/captures/04-morph-prismatique-clair.png
+out/captures/05-interactive-clair.png
+out/captures/06-signature-clair.png
+out/captures/06-signature-balanced-clair.png
+out/captures/01-surface-low-clair.png
+out/captures/07-pluie-clair.png
+out/captures/08-barre-liquide-clair.png
+Aucune erreur console
