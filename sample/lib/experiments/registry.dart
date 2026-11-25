@@ -6,6 +6,7 @@ import 'e05_interactive_matter.dart';
 import 'e06_signature.dart';
 import 'e07_rain_on_glass.dart';
 import 'e08_liquid_bar.dart';
+import 'e09_verre_et_buee.dart';
 import 'experiment.dart';
 
 /// Toutes les expériences, dans l'ordre du laboratoire.
@@ -18,4 +19,5 @@ final List<ExperimentLogic Function()> experimentFactories = [
   Signature.new,
   RainOnGlass.new,
   LiquidBar.new,
+  VerreEtBuee.new,
 ];
