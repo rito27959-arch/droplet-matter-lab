@@ -130,7 +130,14 @@ const icones: Record<string, string> = {
               {avantages.map((a, i) => (
                 <div class="page" data-i={i}>
                   <div class={`tel ${i % 2 ? 'tel--bas' : 'tel--haut'}`}>
+                    <i class="tel__bouton tel__bouton--action"></i><i class="tel__bouton tel__bouton--vol1"></i><i class="tel__bouton tel__bouton--vol2"></i><i class="tel__bouton tel__bouton--marche"></i>
                     <div class="tel__ecran">
+                      <div class="tel__etat" aria-hidden="true">
+                        <span class="tel__heure">9:41</span>
+                        <i class="tel__ile"><b></b></i>
+                        <span class="tel__icones"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 16 12"><path d="M8 11.5l2.4-2.9a3.4 3.4 0 0 0-4.8 0zM3.4 6.3a6.7 6.7 0 0 1 9.2 0l1.5-1.8a9.2 9.2 0 0 0-12.2 0zM.2 2.6a11.6 11.6 0 0 1 15.6 0" /></svg><span class="tel__pile"><i></i></span></span>
+                      </div>
+                      <i class="tel__barre-accueil" aria-hidden="true"></i>
                       <div class={`scenario scenario--${a.cle}`}>
                         {a.cle === 'vocaux' && (
                           <div class="fil">
@@ -260,7 +267,10 @@ const icones: Record<string, string> = {
 
   /* ── Le téléphone ─────────────────────────────────────────── */
   .scene { min-height: 100%; display: grid; grid-template-columns: auto minmax(0, 280px); gap: 48px; align-items: center; justify-content: center; padding: 32px; }
-  .appareil { position: relative; width: 402px; height: 874px; padding: 11px; border-radius: 64px; background: #1a1a1c; box-shadow: inset 0 0 0 2px #3a3a3e, inset 0 0 0 5px #0d0d0f, 0 40px 80px -30px rgb(0 0 0 / 0.8); }
+  .appareil { position: relative; width: 402px; height: 874px; padding: 12px; border-radius: 66px; background: linear-gradient(135deg, #8a8a90 0%, #3a3a40 16%, #1c1c20 40%, #2c2c31 62%, #6d6d74 84%, #2a2a2f 100%); box-shadow: inset 0 0 0 0.8px rgb(255 255 255 / 0.4), inset 0 0 0 4px #121214, inset 0 0 0 11px #030304, 0 50px 90px -30px rgb(0 0 0 / 0.85); }
+  .appareil::before, .appareil::after { content: ''; position: absolute; width: 4px; border-radius: 2px; background: linear-gradient(90deg, #2a2a2f, #7a7a80 45%, #2a2a2f); }
+  .appareil::before { left: -3px; top: 190px; height: 64px; box-shadow: 0 80px 0 #4a4a50; }
+  .appareil::after { right: -3px; top: 250px; height: 100px; }
   .ilot { position: absolute; z-index: 30; top: 22px; left: 50%; width: 120px; height: 34px; margin-left: -60px; border-radius: 20px; background: #000; }
   .ecran { position: relative; width: 100%; height: 100%; border-radius: 54px; overflow: hidden; background: #000; isolation: isolate; }
   .note { display: grid; gap: 8px; color: #8d8d93; font-size: 14px; line-height: 1.5; }
@@ -350,7 +360,7 @@ const icones: Record<string, string> = {
 
   /* ── 2. La présentation : les téléphones qui glissent ── */
   .feuille--demo { top: 54px; display: flex; flex-direction: column; overflow: hidden; }
-  .demo__scene { position: relative; height: 58%; overflow: hidden; touch-action: pan-y; }
+  .demo__scene { position: relative; height: 63%; overflow: hidden; touch-action: pan-y; }
   .demo__deco { position: absolute; inset: 0; width: 100%; height: 100%; transition: background-color 400ms; }
   .demo__piste { position: absolute; inset: 0; perspective: 900px; }
   .page { position: absolute; inset: 0; }
@@ -360,12 +370,37 @@ const icones: Record<string, string> = {
 
   /* Le téléphone d'un avantage : recadré, coupé par le bord de la scène,
      tantôt par le haut, tantôt par le bas (l'idée de Telegram). */
-  .tel { position: absolute; left: 50%; width: 250px; height: 516px; margin-left: -125px; padding: 9px; border-radius: 40px; background: #0d0d0f; box-shadow: inset 0 0 0 1.5px #4a4a50, 0 30px 60px -20px rgb(0 0 0 / 0.7); transform-style: preserve-3d; will-change: transform; }
-  .tel--haut { top: 46px; }
-  .tel--bas { bottom: 46px; }
-  .tel::before { content: ''; position: absolute; z-index: 2; top: 18px; left: 50%; width: 66px; height: 20px; margin-left: -33px; border-radius: 12px; background: #000; }
-  .tel__ecran { position: relative; height: 100%; border-radius: 32px; overflow: hidden; background: #0b0b0c; }
-  .tel__reflet { position: absolute; inset: 0; border-radius: 40px; pointer-events: none; background: linear-gradient(115deg, rgb(255 255 255 / 0.10), transparent 32%); }
+  /* Un vrai téléphone : cadre en titane poli (dégradé métallique et
+     chanfrein), boutons sur la tranche, bordure noire de l'écran, îlot
+     dynamique avec sa lentille, barre d'état, barre d'accueil, et le reflet
+     du verre. Taille de Telegram : il remplit la scène et déborde du bord. */
+  .tel { position: absolute; left: 50%; width: 300px; height: 618px; margin-left: -150px; padding: 4px; border-radius: 56px;
+    background: linear-gradient(135deg, #8a8a90 0%, #3a3a40 18%, #1c1c20 40%, #2c2c31 62%, #6d6d74 82%, #2a2a2f 100%);
+    box-shadow: inset 0 0 0 0.6px rgb(255 255 255 / 0.45), inset 0 0 1.5px 1.6px rgb(0 0 0 / 0.65), 0 40px 70px -22px rgb(0 0 0 / 0.75), 0 8px 18px -8px rgb(0 0 0 / 0.5);
+    transform-style: preserve-3d; will-change: transform; }
+  .tel--haut { top: 38px; }
+  .tel--bas { bottom: 38px; }
+  .tel__ecran { position: relative; height: 100%; border-radius: 52px; padding: 0; overflow: hidden; background: #0b0b0c;
+    box-shadow: inset 0 0 0 7px #050506, inset 0 0 0 7.6px rgb(255 255 255 / 0.06); }
+  .tel__ecran > .scenario { inset: 7px; border-radius: 45px; overflow: hidden; }
+  .tel__bouton { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(90deg, #2a2a2f, #7a7a80 45%, #2a2a2f); }
+  .tel__bouton--action { left: -2.5px; top: 104px; height: 26px; }
+  .tel__bouton--vol1 { left: -2.5px; top: 148px; height: 48px; }
+  .tel__bouton--vol2 { left: -2.5px; top: 206px; height: 48px; }
+  .tel__bouton--marche { right: -2.5px; top: 176px; height: 74px; }
+  .tel__etat { position: absolute; z-index: 3; inset: 7px 7px auto; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 6px 26px 0 30px; color: #fff; font-size: 13.5px; font-weight: 650; letter-spacing: -0.01em; pointer-events: none; }
+  .tel__heure { font-variant-numeric: tabular-nums; width: 44px; }
+  .tel__ile { position: absolute; left: 50%; top: 11px; width: 92px; height: 27px; margin-left: -46px; border-radius: 16px; background: #000; }
+  .tel__ile b { position: absolute; right: 10px; top: 8px; width: 11px; height: 11px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #3a4a6a 0, #121826 45%, #05060a 70%); box-shadow: 0 0 0 1px #0d0f14; }
+  .tel__icones { display: flex; align-items: center; gap: 5px; }
+  .tel__icones svg { width: 16px; height: 11px; fill: #fff; }
+  .tel__icones svg:nth-child(2) { fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; }
+  .tel__pile { position: relative; width: 24px; height: 12px; border-radius: 3.5px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.45); }
+  .tel__pile::after { content: ''; position: absolute; right: -3px; top: 4px; width: 1.6px; height: 4px; border-radius: 0 1px 1px 0; background: rgb(255 255 255 / 0.45); }
+  .tel__pile i { position: absolute; inset: 2px 5px 2px 2px; border-radius: 2px; background: #fff; }
+  .tel__barre-accueil { position: absolute; z-index: 3; left: 50%; bottom: 15px; width: 112px; height: 4.5px; margin-left: -56px; border-radius: 3px; background: rgb(255 255 255 / 0.85); }
+  .tel__reflet { position: absolute; z-index: 4; inset: 4px; border-radius: 52px; pointer-events: none;
+    background: linear-gradient(118deg, rgb(255 255 255 / 0.13) 0%, rgb(255 255 255 / 0.04) 22%, transparent 34%), linear-gradient(300deg, rgb(255 255 255 / 0.05), transparent 25%); }
 
   .points { display: flex; justify-content: center; gap: 7px; padding: 14px 0 4px; }
   .points i { width: 7px; height: 7px; border-radius: 4px; background: #48484a; transition: width 300ms var(--sortie), background-color 300ms; }
@@ -381,9 +416,9 @@ const icones: Record<string, string> = {
   .scenario { position: absolute; inset: 0; }
   /* Le contenu se place dans la partie VISIBLE du téléphone : en haut quand
      il est coupé par le bas, en bas quand il est coupé par le haut. */
-  .fil { position: absolute; inset: 52px 10px 16px; display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; font-size: 13px; line-height: 1.35; }
-  .tel--haut .fil { padding-top: 40px; }
-  .tel--bas .fil { justify-content: flex-end; padding-bottom: 30px; }
+  .fil { position: absolute; inset: 56px 12px 30px; display: flex; flex-direction: column; justify-content: flex-start; gap: 7px; font-size: 14px; line-height: 1.35; }
+  .tel--haut .fil { padding-top: 18px; }
+  .tel--bas .fil { justify-content: flex-end; padding-bottom: 14px; }
   .bulle { max-width: 86%; padding: 7px 10px; border-radius: 16px; opacity: 0; transform: translateY(10px) scale(0.96); }
   .bulle--recu { align-self: flex-start; background: #262628; border-bottom-left-radius: 5px; }
   .bulle--envoye { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 5px; }
@@ -423,7 +458,8 @@ const icones: Record<string, string> = {
     33% { background: radial-gradient(circle at 70% 30%, #6b2f7f, #1a0e24 70%); }
     66% { background: radial-gradient(circle at 40% 80%, #1f6f5c, #0a1f1a 70%); }
   }
-  .fil--fond { inset: 0; padding: 52px 10px 14px; }
+  .fil--fond { inset: 0; padding: 74px 12px 30px; }
+  .tel--haut .fil.fil--fond { padding-top: 70px; }
 
   .trad { display: grid; gap: 4px; }
   .trad__fr { color: #fff; max-height: 0; overflow: hidden; opacity: 0; border-top: 0.5px solid transparent; }
@@ -433,12 +469,12 @@ const icones: Record<string, string> = {
   @keyframes deplie { to { max-height: 60px; opacity: 1; padding-top: 4px; border-top-color: rgb(255 255 255 / 0.15); } }
 
   .fil--centre { align-items: center; justify-content: center !important; }
-  .goutte-anim { width: 120px; height: 140px; transform-origin: 50% 100%; }
+  .goutte-anim { width: 150px; height: 175px; transform-origin: 50% 100%; }
   .page.joue .goutte-anim { animation: saute 1.6s var(--ressort) infinite; }
   @keyframes saute { 0%, 100% { transform: scale(1, 1); } 15% { transform: scale(1.12, 0.86); } 40% { transform: translateY(-38px) scale(0.92, 1.1); } 65% { transform: scale(1.08, 0.92); } }
 
-  .accueil-tel { position: absolute; inset: 96px 14px 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; align-content: start; }
-  .tel--bas .accueil-tel { inset: auto 14px 44px; }
+  .accueil-tel { position: absolute; inset: 78px 18px 56px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; align-content: start; }
+  .tel--bas .accueil-tel { inset: auto 18px 40px; }
   .app-ic { aspect-ratio: 1; border-radius: 12px; background: hsl(calc(var(--k) * 33) 45% 42%); opacity: 0.55; }
   .app-ic--droplet { position: relative; opacity: 1; background: #0A84FF; }
   .app-ic--droplet b { position: absolute; inset: 22%; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #fff; }
