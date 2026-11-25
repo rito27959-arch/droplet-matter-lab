@@ -231,6 +231,24 @@ class _ExperimentViewState extends State<ExperimentView> with SingleTickerProvid
                 builder: (context, _, __) => widget.logic.foreground(context, _frame!) ?? const SizedBox.shrink(),
               ),
             ),
+          // Les composants plein écran montrent un vrai contenu : un voile en
+          // haut garde le titre lisible au-dessus.
+          if (body != null)
+            IgnorePointer(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  height: 210,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [c.background.withValues(alpha: 0.92), c.background.withValues(alpha: 0)],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
