@@ -327,6 +327,7 @@ class _VitreEmbueeState extends State<VitreEmbuee> with WidgetsBindingObserver, 
     if (_phase == _Phase.aucune || _nette == null) return contenu;
     final prendTouchers = _phase == _Phase.entree || _phase == _Phase.active;
     return Stack(
+      fit: StackFit.passthrough,
       children: [
         contenu,
         Positioned.fill(
