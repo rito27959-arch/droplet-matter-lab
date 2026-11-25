@@ -1,0 +1,108 @@
+name: Lab
+
+# Compile le laboratoire, lance les tests, construit le web et l'APK,
+# capture chaque expérience dans un navigateur, et publie le tout sur la
+# branche `captures` (images, APK, journaux).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lab-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shaders générés à jour
+        run: python3 tool/build_shaders.py --check
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Dossiers de plateforme (première fois seulement)
+        id: platforms
+        run: |
+          if [ ! -d android ] || [ ! -d web ]; then
+            flutter create --platforms=android,web --org app.dropletmesh --project-name droplet_matter_lab .
+            rm -f test/widget_test.dart
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Versions
+        run: |
+          mkdir -p out/logs
+          flutter --version | tee out/logs/flutter-version.txt
+
+      - name: Dépendances
+        run: flutter pub get
+
+      - name: Analyse
+        run: |
+          set -o pipefail
+          flutter analyze --no-fatal-infos 2>&1 | tee out/logs/analyze.txt
+
+      - name: Tests
+        run: |
+          set -o pipefail
+          flutter test 2>&1 | tee out/logs/test.txt
+
+      - name: Web
+        run: |
+          set -o pipefail
+          flutter build web --release 2>&1 | tee out/logs/build-web.txt
+
+      - name: APK
+        run: |
+          set -o pipefail
+          flutter build apk --release 2>&1 | tee out/logs/build-apk.txt
+          cp build/app/outputs/flutter-apk/app-release.apk out/droplet-matter-lab.apk
+
+      - name: Captures
+        run: |
+          set -o pipefail
+          npm init -y >/dev/null
+          npm install playwright@1.49.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+          (cd build/web && python3 -m http.server 8080 >/dev/null 2>&1 &)
+          sleep 2
+          node tool/capture.mjs 2>&1 | tee out/logs/captures.txt
+
+      - name: Valider les dossiers de plateforme créés
+        if: steps.platforms.outputs.created == 'true'
+        run: |
+          git config user.name "droplet-lab-ci"
+          git config user.email "droplet-lab-ci@users.noreply.github.com"
+          git add android web .metadata
+          git commit -m "Ajoute les dossiers de plateforme générés par flutter create" || true
+          git push origin HEAD:main || true
+
+      - name: Publier sur la branche captures
+        if: always()
+        run: |
+          mkdir -p out
+          echo "${GITHUB_SHA}" > out/commit.txt
+          cd out
+          git init -q
+          git config user.name "droplet-lab-ci"
+          git config user.email "droplet-lab-ci@users.noreply.github.com"
+          git checkout -q -b captures
+          git add -A
+          git commit -q -m "Captures et journaux pour ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" captures
