@@ -1,14 +1,15 @@
 ---
 import '../styles/global.css';
-import '../styles/liquid.css';
 import Nav from '../components/Nav.astro';
+import { produits } from '../data/produits';
 
 interface Props {
   title: string;
   description: string;
-  current?: 'accueil' | 'composants';
+  current?: 'accueil' | 'messenger';
+  surHeros?: boolean;
 }
-const { title, description, current = 'accueil' } = Astro.props;
+const { title, description, current = 'accueil', surHeros = false } = Astro.props;
 ---
 <!doctype html>
 <html lang="fr">
@@ -34,18 +35,35 @@ const { title, description, current = 'accueil' } = Astro.props;
   </head>
   <body>
     <a class="evitement" href="#contenu">Aller au contenu</a>
-    <Nav current={current} />
+    <Nav current={current} surHeros={surHeros} />
     <main id="contenu">
       <slot />
     </main>
-    <footer class="pied conteneur">
-      <p class="caption">
-        Site d’exemple du Droplet Design Language, pour validation. Aucune page de dropletmesh.app n’a été modifiée.
-      </p>
-      <p class="caption">
-        Polices sous SIL Open Font License 1.1 : Commissioner, Martian Mono, Newsreader.
-        Fonds de la vitre dessinés par programme.
-      </p>
+    <footer class="pied">
+      <div class="conteneur pied-grille">
+        <p class="pied-marque">Droplet</p>
+        <nav aria-label="Produits">
+          <p class="caption">Produits</p>
+          <ul>
+            {produits.map((p) => {
+              const href = p.page ?? p.externe;
+              return <li>{href ? <a href={href}>{p.nom}</a> : <span class="doux">{p.nom}</span>}</li>;
+            })}
+          </ul>
+        </nav>
+        <nav aria-label="Écosystème">
+          <p class="caption">Écosystème</p>
+          <ul>
+            <li><a href="/#chemin">Comment ça marche</a></li>
+            <li><a href="/#confidentialite">Sécurité</a></li>
+            <li><a href="/#telecharger">Télécharger</a></li>
+          </ul>
+        </nav>
+        <div class="pied-note">
+          <p class="caption">Site d’exemple du Droplet Design Language, pour validation. Aucune page de dropletmesh.app n’a été modifiée.</p>
+          <p class="caption">Polices sous SIL Open Font License 1.1 : Commissioner, Martian Mono, Newsreader.</p>
+        </div>
+      </div>
     </footer>
   </body>
 </html>
@@ -64,14 +82,52 @@ const { title, description, current = 'accueil' } = Astro.props;
     border-radius: 8px;
   }
   .pied {
-    border-top: 1px solid var(--trait);
-    padding-block: var(--e-6) var(--e-8);
     margin-top: var(--e-9);
+    border-top: 1px solid var(--trait);
+    padding-block: var(--e-7) var(--e-8);
+  }
+  .pied-grille {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 3fr;
+    gap: var(--e-6);
+  }
+  .pied-marque {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'FLAR' 100;
+  }
+  .pied ul {
+    list-style: none;
+    margin: var(--e-3) 0 0;
+    padding: 0;
     display: grid;
     gap: var(--e-2);
   }
+  .pied a {
+    text-decoration: none;
+    color: var(--encre);
+  }
+  .pied a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .pied p {
     margin: 0;
-    max-width: 68ch;
+  }
+  .pied-note {
+    display: grid;
+    gap: var(--e-2);
+    max-width: 46ch;
+  }
+  @media (max-width: 760px) {
+    .pied-grille {
+      grid-template-columns: 1fr 1fr;
+    }
+    .pied-marque,
+    .pied-note {
+      grid-column: 1 / -1;
+    }
   }
 </style>

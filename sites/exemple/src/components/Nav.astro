@@ -1,384 +1,329 @@
 ---
-// Navigation en verre liquide.
-// Bureau : trois morceaux de verre séparés, comme les groupes d'une barre
-// d'outils — la marque, les liens (une lentille glisse sous le lien survolé ou
-// actif), l'action. En descendant, les liens se replient et ne laissent que la
-// section en cours ; en remontant, ils reviennent.
-// Mobile : la marque en haut, une barre d'onglets en bas, à portée du pouce,
-// avec l'action dans sa propre goutte.
+// Navigation : une barre plate, typographique, qui s'efface derrière le contenu.
+// Pas de verre. Un filet d'un pixel n'apparaît qu'une fois la page défilée.
+// « Produits » ouvre un panneau ; sur mobile, « Menu » ouvre un panneau plein écran.
+import { produits } from '../data/produits';
+
 interface Props {
-  current: 'accueil' | 'composants';
+  current: 'accueil' | 'messenger';
+  surHeros?: boolean;
 }
-const { current } = Astro.props;
-const liens = [
-  { href: '/#chemin', label: 'Comment ça passe', court: 'Chemin', id: 'chemin', d: 'M4 18c4 0 4-12 8-12s4 12 8 12' },
-  { href: '/#confidentialite', label: 'Confidentialité', court: 'Sécurité', id: 'confidentialite', d: 'M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6Z' },
-  { href: '/composants/', label: 'Composants', court: 'Composants', id: 'composants', d: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
-];
-const accueil = { href: '/', label: 'Accueil', court: 'Accueil', id: 'accueil', d: 'M4 11l8-7 8 7v9h-5v-6H9v6H4Z' };
-const goutte = 'M12 3C9 8 6 11.5 6 15a6 6 0 0 0 12 0c0-3.5-3-7-6-12Z';
+const { current, surHeros = false } = Astro.props;
 ---
-<header class="nav" data-nav data-current={current}>
-  <a class="morceau marque lg" href="/" aria-label="Droplet, accueil">
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d={goutte} fill="currentColor" /></svg>
-    <span>Droplet</span>
-  </a>
+<header class:list={['barre', { 'sur-heros': surHeros }]} data-barre>
+  <div class="barre-interieur conteneur">
+    <a class="marque" href="/" aria-label="Droplet, accueil">Droplet</a>
 
-  <nav class="morceau liens lg" aria-label="Navigation principale" data-liens>
-    <span class="lentille-nav" aria-hidden="true"></span>
-    {liens.map((l) => (
-      <a class="lien" href={l.href} data-id={l.id} aria-current={current === l.id ? 'page' : undefined}>{l.label}</a>
-    ))}
-  </nav>
+    <nav class="liens" aria-label="Navigation principale">
+      <button class="lien" type="button" aria-expanded="false" aria-controls="panneau-produits" data-ouvre="panneau-produits">
+        Produits
+        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </button>
+      <a class="lien" href="/#chemin">Comment ça marche</a>
+      <a class="lien" href="/#confidentialite">Sécurité</a>
+    </nav>
 
-  <div class="droite">
-    <button class="morceau rond lg" type="button" aria-label="Passer au thème sombre" data-theme-toggle>
-      <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8">
-        <circle cx="12" cy="12" r="8" />
-        <path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none" />
-      </svg>
-    </button>
-    <a class="morceau action lg lg-proeminent" href="/#telecharger">Télécharger</a>
+    <div class="actions">
+      <button class="icone" type="button" aria-label="Passer au thème sombre" data-theme-toggle>
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="12" cy="12" r="8" />
+          <path d="M12 4a8 8 0 0 0 0 16Z" fill="currentColor" stroke="none" />
+        </svg>
+      </button>
+      <a class="bouton bouton-principal bouton-petit telecharger" href="/#telecharger">Télécharger</a>
+      <button class="menu-mobile label" type="button" aria-expanded="false" aria-controls="panneau-mobile" data-ouvre="panneau-mobile">Menu</button>
+    </div>
+  </div>
+
+  <div class="panneau" id="panneau-produits" hidden>
+    <ul class="conteneur produits-liste">
+      {produits.map((p) => {
+        const href = p.page ?? p.externe;
+        return (
+          <li>
+            {href ? (
+              <a class="produit" href={href} aria-current={current === p.id ? 'page' : undefined}>
+                <span class="subtitle">{p.nom}</span>
+                <span class="caption">{p.phrase}</span>
+                <span class="technique doux">{p.plateforme}</span>
+              </a>
+            ) : (
+              <div class="produit sans-page">
+                <span class="subtitle">{p.nom}</span>
+                <span class="caption">{p.phrase}</span>
+                <span class="technique doux">{p.plateforme}</span>
+                <span class="caption">Page à venir</span>
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+
+  <div class="panneau plein" id="panneau-mobile" hidden>
+    <div class="conteneur plein-interieur">
+      <p class="caption">Produits</p>
+      <ul class="plein-liste">
+        {produits.map((p) => {
+          const href = p.page ?? p.externe;
+          return <li>{href ? <a href={href} class="title">{p.nom}</a> : <span class="title doux">{p.nom}</span>}</li>;
+        })}
+      </ul>
+      <ul class="plein-liste secondaire">
+        <li><a href="/#chemin" class="subtitle">Comment ça marche</a></li>
+        <li><a href="/#confidentialite" class="subtitle">Sécurité</a></li>
+      </ul>
+      <a class="bouton bouton-principal" href="/#telecharger">Télécharger</a>
+    </div>
   </div>
 </header>
 
-<nav class="onglets-site lg" aria-label="Navigation" data-onglets-site>
-  <span class="lentille-onglets" aria-hidden="true"></span>
-  {[accueil, ...liens].map((l) => (
-    <a class="onglet-site" href={l.href} data-id={l.id} aria-current={current === l.id ? 'page' : undefined}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d={l.d} /></svg>
-      <span>{l.court}</span>
-    </a>
-  ))}
-</nav>
-<a class="action-mobile lg lg-proeminent" href="/#telecharger" aria-label="Télécharger pour Android">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14" /></svg>
-</a>
-
 <script>
-  import { lens, followLight, Spring, animate, reducedMotion } from '../scripts/liquid';
+  const barre = document.querySelector<HTMLElement>('[data-barre]')!;
 
-  followLight();
-  document.querySelectorAll<HTMLElement>('.nav .lg, .onglets-site, .action-mobile').forEach((el) => lens(el));
+  // Le filet (et le fond, au-dessus du héros) n'apparaît qu'après 8 px de défilement.
+  const sync = () => barre.classList.toggle('defilee', scrollY > 8);
+  addEventListener('scroll', sync, { passive: true });
+  sync();
+
+  // Panneaux : un seul ouvert à la fois ; Échap ou un clic ailleurs ferme.
+  const boutons = [...barre.querySelectorAll<HTMLButtonElement>('[data-ouvre]')];
+  const fermer = (sauf?: HTMLButtonElement) =>
+    boutons.forEach((b) => {
+      if (b === sauf) return;
+      b.setAttribute('aria-expanded', 'false');
+      document.getElementById(b.dataset.ouvre!)!.hidden = true;
+    });
+  boutons.forEach((b) =>
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const panneau = document.getElementById(b.dataset.ouvre!)!;
+      const ouvrir = panneau.hidden;
+      fermer(b);
+      panneau.hidden = !ouvrir;
+      b.setAttribute('aria-expanded', String(ouvrir));
+      barre.classList.toggle('panneau-ouvert', ouvrir);
+      document.documentElement.classList.toggle('sans-defilement', ouvrir && b.dataset.ouvre === 'panneau-mobile');
+      if (ouvrir) panneau.querySelector<HTMLElement>('a')?.focus({ preventScroll: true });
+    }),
+  );
+  const toutFermer = () => {
+    fermer();
+    barre.classList.remove('panneau-ouvert');
+    document.documentElement.classList.remove('sans-defilement');
+  };
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLElement).closest('.panneau')) toutFermer();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const ouvert = boutons.find((b) => b.getAttribute('aria-expanded') === 'true');
+    toutFermer();
+    ouvert?.focus();
+  });
 
   // Thème
-  const btn = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
-  const sync = () => {
+  const theme = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+  const libelle = () => {
     const dark = document.documentElement.dataset.theme === 'dark';
-    btn?.setAttribute('aria-label', dark ? 'Passer au thème clair' : 'Passer au thème sombre');
+    theme?.setAttribute('aria-label', dark ? 'Passer au thème clair' : 'Passer au thème sombre');
   };
-  sync();
-  btn?.addEventListener('click', () => {
+  libelle();
+  theme?.addEventListener('click', () => {
     const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem('theme', next);
     } catch {}
-    sync();
-    document.dispatchEvent(new CustomEvent('themechange'));
+    libelle();
   });
-
-  /** Une lentille liquide qui suit un lien : ressort, étirement selon la vitesse. */
-  function lentille(host: HTMLElement, el: HTMLElement, items: HTMLElement[]) {
-    const x = new Spring(0, 340, 0.72), w = new Spring(0, 340, 0.85);
-    let first = true, shown = 0;
-    const show = new Spring(0, 300, 0.8);
-    const render = () => {
-      const sx = 1 + Math.min(Math.abs(x.v) / 2400, 0.28);
-      el.style.width = `${w.x}px`;
-      el.style.transform = `translateX(${x.x}px) scale(${sx}, ${1 / Math.sqrt(sx)})`;
-      el.style.opacity = String(Math.min(Math.max(show.x, 0), 1));
-    };
-    const go = (item: HTMLElement | null) => {
-      if (!item) {
-        show.target = 0;
-      } else {
-        show.target = 1;
-        x.target = item.offsetLeft;
-        w.target = item.offsetWidth;
-        if (first || reducedMotion() || shown < 0.05) {
-          x.x = x.target;
-          w.x = w.target;
-          first = false;
-        }
-      }
-      animate((dt) => {
-        x.step(dt);
-        w.step(dt);
-        show.step(dt);
-        shown = show.x;
-        render();
-        return !(x.resting && w.resting && show.resting);
-      });
-    };
-    const active = () => items.find((i) => i.getAttribute('aria-current') === 'page') ?? null;
-    items.forEach((i) => {
-      i.addEventListener('pointerenter', () => go(i));
-      i.addEventListener('focus', () => go(i));
-    });
-    host.addEventListener('pointerleave', () => go(active()));
-    host.addEventListener('focusout', () => go(active()));
-    addEventListener('resize', () => go(active()));
-    requestAnimationFrame(() => go(active()));
-    return { refresh: () => go(active()) };
-  }
-
-  const liens = document.querySelector<HTMLElement>('[data-liens]')!;
-  const items = [...liens.querySelectorAll<HTMLElement>('.lien')];
-  const lensNav = lentille(liens, liens.querySelector('.lentille-nav')!, items);
-  const onglets = document.querySelector<HTMLElement>('[data-onglets-site]')!;
-  const itemsMob = [...onglets.querySelectorAll<HTMLElement>('.onglet-site')];
-  const lensMob = lentille(onglets, onglets.querySelector('.lentille-onglets')!, itemsMob);
-
-  // Section en cours (page d'accueil) : la lentille la suit pendant la lecture.
-  const nav = document.querySelector<HTMLElement>('[data-nav]')!;
-  if (nav.dataset.current === 'accueil') {
-    const sections = ['chemin', 'confidentialite'].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
-    const mark = (id: string) => {
-      [...items, ...itemsMob].forEach((a) => (a.dataset.id === id ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
-      lensNav.refresh();
-      lensMob.refresh();
-    };
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) mark((visible.target as HTMLElement).id);
-      },
-      { rootMargin: '-40% 0px -50% 0px' },
-    );
-    sections.forEach((s) => io.observe(s));
-    addEventListener('scroll', () => scrollY < innerHeight * 0.6 && mark('accueil'), { passive: true });
-  }
-
-  // En descendant, la navigation se replie ; en remontant, elle revient.
-  let last = scrollY;
-  addEventListener(
-    'scroll',
-    () => {
-      const y = scrollY;
-      if (Math.abs(y - last) < 8) return;
-      const down = y > last && y > 120;
-      nav.classList.toggle('repliee', down);
-      onglets.classList.toggle('repliee', down);
-      document.querySelector('.action-mobile')?.classList.toggle('repliee', down);
-      last = y;
-      setTimeout(() => {
-        lensNav.refresh();
-        lensMob.refresh();
-      }, 460);
-    },
-    { passive: true },
-  );
 </script>
 
 <style>
-  .nav {
-    position: fixed;
-    top: max(14px, env(safe-area-inset-top));
-    left: 50%;
-    translate: -50% 0;
+  .barre {
+    position: sticky;
+    top: 0;
     z-index: 50;
+    background: var(--fond);
+    transition: background-color 150ms ease, box-shadow 150ms ease;
+  }
+  .barre.defilee,
+  .barre.panneau-ouvert {
+    box-shadow: 0 1px 0 var(--trait);
+  }
+  /* Sur l'accueil, la barre est posée sur la vitre jusqu'au premier défilement. */
+  .barre.sur-heros {
+    position: fixed;
+    inset: 0 0 auto 0;
+    background: transparent;
+  }
+  .barre.sur-heros.defilee,
+  .barre.sur-heros.panneau-ouvert {
+    background: var(--fond);
+  }
+  .barre-interieur {
     display: flex;
     align-items: center;
-    gap: 10px;
-    width: max-content;
-    max-width: calc(100% - 24px);
-  }
-  .morceau {
-    height: 52px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-    transition:
-      max-width 520ms var(--courbe-ressort),
-      padding 520ms var(--courbe-ressort),
-      opacity 300ms,
-      transform 520ms var(--courbe-ressort);
+    gap: var(--e-6);
+    height: 64px;
   }
   .marque {
-    gap: 8px;
-    padding: 0 20px 0 16px;
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: -0.02em;
     font-variation-settings: 'FLAR' 100, 'VOLM' 40;
+    text-decoration: none;
   }
   .liens {
-    position: relative;
-    padding: 5px;
-    gap: 0;
-    max-width: 520px;
-    overflow: hidden;
+    display: flex;
+    gap: var(--e-5);
   }
   .lien {
-    position: relative;
-    z-index: 1;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    height: 42px;
-    padding: 0 16px;
-    border-radius: 999px;
-    color: rgb(var(--lg-encre) / 0.72);
-    font: 600 14.5px 'Commissioner', system-ui, sans-serif;
+    gap: 6px;
+    padding: 8px 0;
+    border: 0;
+    background: none;
+    color: var(--encre-douce);
+    font: 500 15px 'Commissioner', system-ui, sans-serif;
     text-decoration: none;
-    white-space: nowrap;
-    transition: color 200ms, opacity 300ms;
+    cursor: pointer;
+    transition: color 120ms ease;
   }
   .lien:hover,
-  .lien[aria-current='page'] {
-    color: rgb(var(--lg-encre));
+  .lien[aria-expanded='true'] {
+    color: var(--encre);
   }
-  .lien:focus-visible {
-    outline: none;
+  .lien svg {
+    transition: transform 180ms var(--sortie);
   }
-  .lentille-nav,
-  .lentille-onglets {
-    position: absolute;
-    left: 0;
-    border-radius: 999px;
-    background: rgb(var(--lg-encre) / 0.09);
-    box-shadow: inset 0 0.5px 0 rgb(255 255 255 / 0.6), inset 0 0 0 0.5px rgb(var(--lg-encre) / 0.06);
-    will-change: transform, width;
-    pointer-events: none;
+  .lien[aria-expanded='true'] svg {
+    transform: rotate(180deg);
   }
-  .lentille-nav {
-    top: 5px;
-    height: 42px;
-  }
-  .droite {
+  .actions {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: var(--e-2);
+    margin-left: auto;
   }
-  .rond {
-    width: 52px;
-    justify-content: center;
+  .icone {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
     border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--encre);
     cursor: pointer;
-    padding: 0;
   }
-  .action {
-    padding: 0 22px;
-    font: 650 15px 'Commissioner', system-ui, sans-serif;
+  .icone:hover {
+    background: color-mix(in srgb, var(--encre) 7%, transparent);
   }
-  .morceau:active {
-    transform: scale(1.05);
+  .menu-mobile {
+    display: none;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--trait);
+    border-radius: 999px;
+    background: none;
+    color: var(--encre);
+    cursor: pointer;
   }
 
-  /* Repliée : les liens ne gardent que la section en cours. */
-  .nav.repliee .lien:not([aria-current='page']) {
-    max-width: 0;
-    padding: 0;
-    opacity: 0;
+  /* Panneau Produits : apparaît depuis la barre, 180 ms. */
+  .panneau {
+    position: absolute;
+    inset: 100% 0 auto 0;
+    background: var(--fond);
+    box-shadow: 0 1px 0 var(--trait), 0 24px 40px -24px rgb(0 0 0 / 0.25);
+    transform-origin: top center;
+    animation: panneau 180ms var(--sortie);
   }
-  .nav.repliee .lien {
-    max-width: 240px;
+  @keyframes panneau {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.985);
+    }
   }
-  .lien {
-    max-width: 240px;
-    transition: max-width 520ms var(--courbe-ressort), padding 520ms var(--courbe-ressort), opacity 260ms, color 200ms;
+  .produits-liste {
+    list-style: none;
+    margin: 0 auto;
+    padding: var(--e-5) 0 var(--e-6);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
   }
-  .nav.repliee .marque span {
-    display: none;
+  .produits-liste li + li {
+    border-left: 1px solid var(--trait);
   }
-  .nav.repliee .marque {
-    padding: 0 17px;
+  .produit {
+    display: grid;
+    gap: 6px;
+    align-content: start;
+    height: 100%;
+    padding: var(--e-3) var(--e-4);
+    text-decoration: none;
+    border-radius: var(--r-controle);
+    transition: background-color 120ms ease;
   }
-  .nav.repliee .rond {
-    opacity: 0;
-    width: 0;
-    margin-left: -10px;
-    pointer-events: none;
+  a.produit:hover,
+  a.produit:focus-visible {
+    background: color-mix(in srgb, var(--encre) 5%, transparent);
+  }
+  .sans-page .subtitle {
+    color: var(--encre-douce);
   }
 
-  /* Mobile : barre d'onglets en bas. */
-  .onglets-site,
-  .action-mobile {
-    display: none;
+  .plein {
+    position: fixed;
+    inset: 64px 0 0 0;
+    overflow-y: auto;
+    animation: plein 260ms var(--sortie);
   }
-  @media (max-width: 760px) {
+  @keyframes plein {
+    from {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+  }
+  .plein-interieur {
+    display: grid;
+    gap: var(--e-5);
+    padding-block: var(--e-5) var(--e-8);
+  }
+  .plein-interieur p {
+    margin: 0;
+  }
+  .plein-liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--e-3);
+  }
+  .plein-liste a {
+    text-decoration: none;
+  }
+  .plein-liste.secondaire {
+    padding-top: var(--e-4);
+    border-top: 1px solid var(--trait);
+  }
+
+  @media (max-width: 860px) {
     .liens,
-    .action {
+    .telecharger {
       display: none;
     }
-    .nav {
-      left: 12px;
-      right: 12px;
-      translate: none;
-      width: auto;
-      max-width: none;
-      justify-content: space-between;
+    .menu-mobile {
+      display: inline-block;
     }
-    .morceau {
-      height: 48px;
-    }
-    .rond {
-      width: 48px;
-    }
-    .nav.repliee .rond {
-      opacity: 1;
-      width: 48px;
-      margin: 0;
-      pointer-events: auto;
-    }
-    .onglets-site {
-      position: fixed;
-      z-index: 50;
-      left: 12px;
-      right: 84px;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      padding: 5px;
-      border-radius: 999px;
-      transition: right 520ms var(--courbe-ressort), transform 520ms var(--courbe-ressort);
-    }
-    .onglet-site {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      justify-items: center;
-      align-content: center;
-      gap: 1px;
-      height: 54px;
-      border-radius: 999px;
-      color: rgb(var(--lg-encre) / 0.7);
-      font: 600 10.5px 'Commissioner', sans-serif;
-      text-decoration: none;
-      overflow: hidden;
-    }
-    .onglet-site[aria-current='page'] {
-      color: rgb(var(--lg-encre));
-    }
-    .lentille-onglets {
-      top: 5px;
-      height: 54px;
-    }
-    .action-mobile {
-      position: fixed;
-      z-index: 50;
-      right: 12px;
-      bottom: max(14px, env(safe-area-inset-bottom));
-      display: grid;
-      place-items: center;
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      transition: transform 520ms var(--courbe-ressort);
-    }
-    /* Repliée : seul l'onglet actif reste, la goutte d'action se rapproche. */
-    .onglets-site.repliee {
-      right: calc(100% - 12px - 76px);
-      grid-template-columns: 1fr;
-    }
-    .onglets-site.repliee .onglet-site:not([aria-current='page']) {
-      display: none;
-    }
-    .onglets-site.repliee .onglet-site span {
-      display: none;
-    }
-    .action-mobile.repliee {
-      transform: scale(0.86);
+  }
+  @media (min-width: 861px) {
+    #panneau-mobile {
+      display: none !important;
     }
   }
 </style>

@@ -282,43 +282,44 @@ a {
   font-size: 14px;
 }
 
-/* La matière : réservée à la navigation et aux moments forts. */
-.verre {
-  position: relative;
-  background: var(--verre);
-  -webkit-backdrop-filter: blur(18px) saturate(170%);
-  backdrop-filter: blur(18px) saturate(170%);
-  box-shadow: var(--verre-ombre), inset 0 1px 0 var(--verre-trait), inset 0 -1px 0 rgb(255 255 255 / 0.04);
-  isolation: isolate;
+/* Transitions entre pages (Chrome 126+, Safari 18.2+ ; ailleurs la page change simplement). */
+@view-transition {
+  navigation: auto;
 }
-/* Liseré spectral d'un pixel : la lumière décomposée au bord, et seulement là. */
-.verre::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: conic-gradient(from 200deg, rgb(255 120 120 / 0.0), rgb(255 190 120 / 0.55), rgb(160 255 200 / 0.45), rgb(120 180 255 / 0.55),
-      rgb(210 140 255 / 0.4), rgb(255 120 120 / 0.0) 70%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0.55;
-  pointer-events: none;
+::view-transition-group(*) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1);
 }
-.lens .verre[data-lens] {
-  -webkit-backdrop-filter: url(#lentille-nav) blur(10px) saturate(170%);
-  backdrop-filter: url(#lentille-nav) blur(10px) saturate(170%);
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
 }
 
-/* Mobile : la barre d'onglets du site est en bas, le contenu ne passe pas dessous. */
-@media (max-width: 760px) {
-  body {
-    padding-bottom: 96px;
+/* Courbes du système (sortie douce, entrée-sortie) */
+:root {
+  --sortie: cubic-bezier(0.23, 1, 0.32, 1);
+  --entree-sortie: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Des boutons : seul l'appui bouge. */
+@media (hover: hover) and (pointer: fine) {
+  .bouton-principal:hover {
+    opacity: 0.88;
   }
+}
+.bouton {
+  transition: transform 160ms var(--sortie), background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+.bouton:active {
+  transform: scale(0.97);
 }
 
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
   *,
   *::before,
   *::after {
@@ -327,10 +328,7 @@ a {
     animation-iteration-count: 1 !important;
   }
 }
-@media (prefers-reduced-transparency: reduce) {
-  .verre {
-    background: var(--surface);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+
+html.sans-defilement {
+  overflow: hidden;
 }

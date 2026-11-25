@@ -1,0 +1,578 @@
+---
+// Page produit Messenger : le gabarit commun à toutes les pages produit.
+// 1 héros · 2 ce que ça change · 3 démonstration · 4 savoir par où ça passe
+// 5 caractéristiques · 6 questions · 7 télécharger.
+// Une seule animation forte : la démonstration, pilotée par le défilement.
+import Base from '../../layouts/Base.astro';
+
+const changements = [
+  {
+    id: 'relais',
+    titre: 'Sans internet, ça passe quand même',
+    texte: 'Vos messages sautent d’un téléphone à l’autre jusqu’à leur destinataire. Avec internet, ils partent aussitôt.',
+  },
+  {
+    id: 'chiffrement',
+    titre: 'Les relais ne lisent rien',
+    texte: 'Chiffrés de bout en bout : même les téléphones qui portent vos messages ne peuvent pas les ouvrir.',
+  },
+  {
+    id: 'hors-ligne',
+    titre: 'Quand tout s’arrête',
+    texte: 'Carte hors ligne, positions et « Je suis en sécurité » circulent sans antenne ni opérateur.',
+  },
+];
+
+const caracteristiques = [
+  { nom: 'Radios', valeur: 'Bluetooth LE, Wi-Fi local, Wi-Fi Direct' },
+  { nom: 'Sauts', valeur: 'jusqu’à 5' },
+  { nom: 'Échange de clés', valeur: 'X25519' },
+  { nom: 'Chiffrement des messages', valeur: 'AES-256-GCM' },
+  { nom: 'Serveur pour les messages', valeur: 'aucun' },
+  { nom: 'Appels', valeur: 'un serveur présente les deux téléphones (signalisation WebRTC)' },
+  { nom: 'Inscription', valeur: 'un nom, sans numéro' },
+  { nom: 'Android', valeur: '7.0 ou plus récent' },
+];
+
+const questions = [
+  {
+    q: 'Mon contact doit-il avoir Droplet ?',
+    r: 'Oui. Et plus il y a de proches qui l’installent, plus les messages trouvent de chemins.',
+  },
+  {
+    q: 'Que se passe-t-il si personne n’est autour ?',
+    r: 'Le message attend sur votre téléphone et part dès qu’un appareil passe à portée.',
+  },
+  {
+    q: 'Les téléphones relais peuvent-ils lire mes messages ?',
+    r: 'Non. Ils transportent un message chiffré qu’ils ne peuvent pas ouvrir.',
+  },
+  {
+    q: 'Faut-il donner son numéro ?',
+    r: 'Non. L’inscription demande un nom, et vous pouvez en choisir un qui ne vous identifie pas.',
+  },
+];
+---
+<Base
+  title="Messenger — Droplet"
+  description="Droplet Messenger : la messagerie qui passe, même sans réseau."
+  current="messenger"
+>
+  <section class="heros conteneur" aria-labelledby="titre">
+    <div class="heros-texte">
+      <h1 id="titre" class="display nom" style="view-transition-name: titre-messenger">Messenger</h1>
+      <p class="phrase headline revele">La messagerie qui passe, même sans réseau.</p>
+      <p class="chapo revele">
+        Bluetooth et Wi-Fi relient les téléphones entre eux. Quand le réseau tombe, vos messages continuent de circuler, de
+        proche en proche.
+      </p>
+      <div class="boutons revele">
+        <a class="bouton bouton-principal" href="#telecharger">Télécharger pour Android</a>
+        <a class="bouton bouton-secondaire" href="#demonstration">Voir comment</a>
+      </div>
+    </div>
+    <figure class="ecran heros-ecran">
+      <img src="/captures/messenger-conversation.webp" width="800" height="1649" alt="Une conversation dans Droplet Messenger : messages, message vocal, appel manqué." />
+    </figure>
+  </section>
+
+  <section class="section conteneur" aria-labelledby="titre-changements">
+    <h2 id="titre-changements" class="headline">Ce que ça change.</h2>
+    <ol class="changements">
+      {changements.map((c) => (
+        <li>
+          <figure class="ecran petit">
+            <img class="clair" src={`/captures/messenger-${c.id}-clair.webp`} width="400" height="844" alt="" loading="lazy" />
+            <img class="sombre" src={`/captures/messenger-${c.id}-sombre.webp`} width="400" height="844" alt="" loading="lazy" />
+          </figure>
+          <h3 class="subtitle">{c.titre}</h3>
+          <p class="body doux">{c.texte}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section id="demonstration" class="demo" aria-labelledby="titre-demo">
+    <div class="demo-colle conteneur">
+      <h2 id="titre-demo" class="headline">Un message, deux relais, aucun serveur.</h2>
+      <ol class="demo-etapes">
+        <li class="etape e1"><span class="technique doux">1</span> Amina écrit à Bilal. Il est trop loin : aucune radio ne les relie directement.</li>
+        <li class="etape e2"><span class="technique doux">2</span> Le message passe par deux téléphones qui se trouvent entre eux. Ils le portent sans pouvoir l’ouvrir.</li>
+        <li class="etape e3"><span class="technique doux">3</span> Bilal le reçoit. Ni serveur, ni opérateur ; jusqu’à cinq sauts si nécessaire.</li>
+      </ol>
+      <svg class="demo-schema" viewBox="0 0 1000 260" role="img" aria-label="Le message va d’Amina à Bilal en passant par deux téléphones relais.">
+        <path class="hors-portee" d="M90 96 Q 500 -10 910 96" />
+        <text class="hors-portee-texte" x="500" y="40" text-anchor="middle">hors de portée directe</text>
+        <line class="liaison" x1="90" y1="140" x2="910" y2="140" />
+        <g class="noeud" transform="translate(90 140)"><circle r="12" /></g>
+        <g class="noeud relais r1" transform="translate(370 140)"><circle r="10" /><path class="cadenas" d="M-5 -26h10v8h-10zM-3 -26v-4a3 3 0 0 1 6 0v4" /></g>
+        <g class="noeud relais r2" transform="translate(630 140)"><circle r="10" /><path class="cadenas" d="M-5 -26h10v8h-10zM-3 -26v-4a3 3 0 0 1 6 0v4" /></g>
+        <g class="noeud arrivee" transform="translate(910 140)"><circle r="12" /><path class="coche" d="M-5 0l3.5 3.5L5 -4" /></g>
+        <g class="message"><rect x="74" y="128" width="32" height="24" rx="8" /></g>
+        <text class="nom-noeud" x="90" y="190" text-anchor="middle">Amina</text>
+        <text class="nom-noeud doux" x="370" y="190" text-anchor="middle">Relais</text>
+        <text class="nom-noeud doux" x="630" y="190" text-anchor="middle">Relais</text>
+        <text class="nom-noeud" x="910" y="190" text-anchor="middle">Bilal</text>
+        <text class="radio" x="230" y="108" text-anchor="middle">BLE</text>
+        <text class="radio" x="500" y="108" text-anchor="middle">Wi-Fi Direct</text>
+        <text class="radio" x="770" y="108" text-anchor="middle">BLE</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="section conteneur chemin" aria-labelledby="titre-chemin">
+    <div>
+      <h2 id="titre-chemin" class="headline">Vous savez toujours par où ça passe.</h2>
+      <p class="body doux">
+        En haut de vos discussions, une ligne dit qui est à portée et si internet est là. Chaque conversation affiche aussi son
+        chemin, sous le nom du contact.
+      </p>
+    </div>
+    <figure class="ecran large">
+      <img src="/captures/messenger-liste.webp" width="800" height="723" alt="La liste des discussions : « No one nearby · Internet » sous le titre." loading="lazy" />
+    </figure>
+  </section>
+
+  <section class="section conteneur" aria-labelledby="titre-carac">
+    <h2 id="titre-carac" class="headline">Caractéristiques.</h2>
+    <dl class="carac">
+      {caracteristiques.map((c) => (
+        <div>
+          <dt class="label">{c.nom}</dt>
+          <dd class="technique">{c.valeur}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="section conteneur questions" aria-labelledby="titre-questions">
+    <h2 id="titre-questions" class="headline">Questions.</h2>
+    <div>
+      {questions.map((q) => (
+        <details>
+          <summary class="subtitle">{q.q}</summary>
+          <p class="body doux">{q.r}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <section id="telecharger" class="section conteneur fin" aria-labelledby="titre-fin">
+    <h2 id="titre-fin" class="headline">Prêt avant la prochaine coupure.</h2>
+    <p class="body doux">Pour Android 7.0 ou plus récent. Installez-le aussi chez vos proches : chaque téléphone en plus est un chemin de plus.</p>
+    <div class="boutons">
+      <a class="bouton bouton-principal" href="https://github.com/rito27959-arch/droplet/releases/latest">Télécharger pour Android</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .section {
+    padding-top: var(--e-9);
+  }
+  .boutons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--e-3);
+    margin-top: var(--e-6);
+  }
+
+  /* Captures d'écran : un écran, pas un téléphone dessiné. */
+  .ecran {
+    margin: 0;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid var(--trait);
+    background: #000;
+  }
+  .ecran img {
+    width: 100%;
+    height: auto;
+  }
+  .ecran.petit {
+    border-radius: 22px;
+    background: var(--surface-haute);
+  }
+  .ecran .sombre {
+    display: none;
+  }
+  :root[data-theme='dark'] .ecran .clair {
+    display: none;
+  }
+  :root[data-theme='dark'] .ecran .sombre {
+    display: block;
+  }
+
+  /* 1. Héros */
+  .heros {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--e-8);
+    align-items: center;
+    padding-top: var(--e-8);
+  }
+  .nom {
+    font-size: clamp(56px, 9vw, 112px);
+  }
+  .phrase {
+    margin: var(--e-4) 0 0;
+    max-width: 16ch;
+  }
+  .chapo {
+    margin: var(--e-5) 0 0;
+    max-width: 46ch;
+    font-size: clamp(17px, 1.5vw, 19px);
+    line-height: 1.55;
+    color: var(--encre-douce);
+  }
+  .heros-ecran {
+    max-height: 640px;
+    aspect-ratio: 800 / 1300;
+  }
+  .heros-ecran img {
+    object-fit: cover;
+    object-position: top;
+    height: 100%;
+  }
+  /* Une seule fois, à l'ouverture : où commencer à lire. */
+  .revele {
+    animation: revele 400ms var(--sortie) both;
+  }
+  .phrase.revele {
+    animation-delay: 60ms;
+  }
+  .chapo.revele {
+    animation-delay: 100ms;
+  }
+  .boutons.revele {
+    animation-delay: 140ms;
+  }
+  @keyframes revele {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  /* 2. Ce que ça change */
+  .changements {
+    list-style: none;
+    margin: var(--e-7) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--e-6);
+  }
+  .changements li {
+    display: grid;
+    gap: var(--e-3);
+    align-content: start;
+  }
+  .changements .ecran {
+    aspect-ratio: 400 / 560;
+    margin-bottom: var(--e-3);
+  }
+  .changements img {
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  .changements h3,
+  .changements p {
+    margin: 0;
+  }
+
+  /* 3. Démonstration : sans prise en charge du défilement, les trois étapes se lisent à la suite. */
+  .demo {
+    margin-top: var(--e-9);
+    padding-block: var(--e-8);
+    background: var(--surface);
+    border-block: 1px solid var(--trait);
+  }
+  .demo-colle {
+    display: grid;
+    gap: var(--e-6);
+  }
+  .demo-etapes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--e-3);
+    max-width: 62ch;
+  }
+  .etape {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .etape .technique {
+    margin-right: 10px;
+  }
+  .demo-schema {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+  .hors-portee {
+    fill: none;
+    stroke: var(--encre-douce);
+    stroke-width: 1.5;
+    stroke-dasharray: 3 8;
+    stroke-linecap: round;
+  }
+  .hors-portee-texte,
+  .radio {
+    font: 450 14px 'Martian Mono', monospace;
+    fill: var(--encre-douce);
+  }
+  .liaison {
+    stroke: var(--trait);
+    stroke-width: 2;
+  }
+  .noeud circle {
+    fill: var(--encre);
+  }
+  .relais circle {
+    fill: var(--surface);
+    stroke: var(--encre);
+    stroke-width: 2;
+  }
+  .cadenas {
+    fill: none;
+    stroke: var(--encre);
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+  }
+  .coche {
+    fill: none;
+    stroke: var(--fond);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .message rect {
+    fill: var(--encre);
+  }
+  .message {
+    transform: translateX(820px);
+  }
+  .nom-noeud {
+    font: 600 16px 'Commissioner', sans-serif;
+    fill: var(--encre);
+  }
+  .nom-noeud.doux {
+    fill: var(--encre-douce);
+  }
+
+  /* Avec le défilement : la section reste à l'écran et le schéma avance avec le doigt. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .demo {
+        height: 320vh;
+        padding: 0;
+        view-timeline-name: --demo;
+      }
+      .demo-colle {
+        position: sticky;
+        top: 0;
+        height: 100svh;
+        align-content: center;
+      }
+      .demo-etapes {
+        display: grid;
+        min-height: 3.2em;
+      }
+      .etape {
+        grid-area: 1 / 1;
+      }
+      .e1,
+      .e2,
+      .e3,
+      .message,
+      .r1,
+      .r2,
+      .arrivee,
+      .cadenas {
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --demo;
+        animation-range: contain 0% contain 100%;
+      }
+      .e1 {
+        animation-name: e1;
+      }
+      .e2 {
+        animation-name: e2;
+      }
+      .e3 {
+        animation-name: e3;
+      }
+      .message {
+        animation-name: trajet;
+      }
+      .r1 .cadenas {
+        animation-name: cadenas1;
+      }
+      .r2 .cadenas {
+        animation-name: cadenas2;
+      }
+      .arrivee circle {
+        animation: arrivee linear both;
+        animation-timeline: --demo;
+        animation-range: contain 0% contain 100%;
+      }
+    }
+  }
+  @keyframes e1 {
+    0%, 26% { opacity: 1; transform: none; }
+    32%, 100% { opacity: 0; transform: translateY(-8px); }
+  }
+  @keyframes e2 {
+    0%, 30% { opacity: 0; transform: translateY(8px); }
+    36%, 62% { opacity: 1; transform: none; }
+    68%, 100% { opacity: 0; transform: translateY(-8px); }
+  }
+  @keyframes e3 {
+    0%, 66% { opacity: 0; transform: translateY(8px); }
+    72%, 100% { opacity: 1; transform: none; }
+  }
+  /* Le message s'arrête à chaque relais : il attend, puis repart. */
+  @keyframes trajet {
+    0%, 8% { transform: translateX(0); }
+    28%, 40% { transform: translateX(280px); }
+    58%, 68% { transform: translateX(540px); }
+    86% { transform: translateX(820px); opacity: 1; }
+    92%, 100% { transform: translateX(820px); opacity: 0; }
+  }
+  @keyframes cadenas1 {
+    0%, 26% { opacity: 0; }
+    30%, 100% { opacity: 1; }
+  }
+  @keyframes cadenas2 {
+    0%, 56% { opacity: 0; }
+    60%, 100% { opacity: 1; }
+  }
+  @keyframes arrivee {
+    0%, 84% { fill: var(--encre-douce); }
+    88%, 100% { fill: var(--encre); }
+  }
+
+  /* 4. Par où ça passe */
+  .chemin {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: var(--e-8);
+    align-items: center;
+  }
+  .chemin p {
+    max-width: 46ch;
+    margin: var(--e-4) 0 0;
+  }
+  .ecran.large {
+    border-radius: 22px;
+  }
+
+  /* 5. Caractéristiques : une fiche d'ingénieur, filets d'un pixel. */
+  .carac {
+    margin: var(--e-7) 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--trait);
+  }
+  .carac div {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: var(--e-4);
+    padding: var(--e-4) var(--e-4) var(--e-4) 0;
+    border-bottom: 1px solid var(--trait);
+  }
+  .carac div:nth-child(odd) {
+    border-right: 1px solid var(--trait);
+  }
+  .carac div:nth-child(even) {
+    padding-left: var(--e-5);
+  }
+  .carac dd {
+    margin: 0;
+  }
+
+  /* 6. Questions */
+  .questions {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: var(--e-7);
+  }
+  details {
+    border-bottom: 1px solid var(--trait);
+  }
+  details:first-child {
+    border-top: 1px solid var(--trait);
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--e-4) 0;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--e-4);
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary::after {
+    content: '+';
+    font-weight: 400;
+    color: var(--encre-douce);
+    transition: transform 180ms var(--sortie);
+  }
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+  details p {
+    margin: 0 0 var(--e-4);
+    max-width: 60ch;
+  }
+
+  /* 7. Télécharger */
+  .fin p {
+    margin: var(--e-4) 0 0;
+    max-width: 56ch;
+  }
+
+  @media (max-width: 860px) {
+    .heros,
+    .chemin,
+    .questions {
+      grid-template-columns: 1fr;
+      gap: var(--e-6);
+    }
+    .heros-ecran {
+      max-width: 360px;
+    }
+    .changements {
+      grid-template-columns: 1fr;
+      gap: var(--e-7);
+    }
+    .changements .ecran {
+      max-width: 340px;
+    }
+    .carac {
+      grid-template-columns: 1fr;
+    }
+    .carac div:nth-child(odd) {
+      border-right: 0;
+    }
+    .carac div:nth-child(even) {
+      padding-left: 0;
+    }
+    .demo-schema .radio {
+      font-size: 30px;
+    }
+    .demo-schema .hors-portee-texte {
+      display: none;
+    }
+    .nom-noeud {
+      font-size: 36px;
+    }
+  }
+</style>

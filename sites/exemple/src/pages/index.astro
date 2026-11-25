@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { produits } from '../data/produits';
 
 const transports = [
   { nom: 'Bluetooth LE', portee: '≈ 10 à 100 m', usage: 'Découverte, messages' },
@@ -8,8 +9,9 @@ const transports = [
 ];
 ---
 <Base
-  title="Droplet — exemple du design system"
-  description="Page d’exemple du Droplet Design Language : Prismatic Aether sur une base Quiet Futurism."
+  title="Droplet — exemple"
+  description="Site d’exemple de l’écosystème Droplet : des appareils qui se parlent directement, sans serveur au milieu."
+  surHeros
 >
   <section class="vitre" aria-labelledby="titre">
     <div class="vitre-fond" aria-hidden="true"></div>
@@ -21,11 +23,31 @@ const transports = [
         Droplet relie les téléphones entre eux par Bluetooth et Wi-Fi. Pas d’internet, pas d’opérateur, pas de serveur au milieu.
       </p>
       <div class="boutons">
-        <a class="lgb lg lg-proeminent lgb-grand" href="#telecharger">Télécharger pour Android</a>
-        <a class="lgb lg lgb-grand" href="#chemin">Voir comment ça passe</a>
+        <a class="bouton bouton-principal" href="#telecharger">Télécharger pour Android</a>
+        <a class="bouton bouton-secondaire" href="#produits">Voir les produits</a>
       </div>
       <p class="caption indice">Passez le doigt sur la vitre : la buée s’en va, puis revient.</p>
     </div>
+  </section>
+
+  <section id="produits" class="section conteneur" aria-labelledby="titre-produits">
+    <div class="intro">
+      <h2 id="titre-produits" class="headline">Cinq produits, une même règle&nbsp;: les appareils se parlent directement.</h2>
+    </div>
+    <ul class="produits">
+      {produits.map((p) => {
+        const href = p.page ?? p.externe;
+        const contenu = (
+          <>
+            <span class="produit-nom title" style={p.id === 'messenger' ? 'view-transition-name: titre-messenger' : undefined}>{p.nom}</span>
+            <span class="produit-phrase body doux">{p.phrase}</span>
+            <span class="produit-plateforme technique doux">{p.plateforme}</span>
+            <span class="produit-lien label">{p.page ? 'Découvrir' : p.externe ? 'Ouvrir le site' : 'Page à venir'}</span>
+          </>
+        );
+        return <li>{href ? <a class="produit" href={href}>{contenu}</a> : <div class="produit sans-page">{contenu}</div>}</li>;
+      })}
+    </ul>
   </section>
 
   <section id="chemin" class="section conteneur" aria-labelledby="titre-chemin">
@@ -45,7 +67,6 @@ const transports = [
         <g class="noeud relais" transform="translate(380 92)"><circle r="7" /></g>
         <g class="noeud relais" transform="translate(620 92)"><circle r="7" /></g>
         <g class="noeud" transform="translate(930 92)"><circle r="9" /></g>
-        <circle class="goutte" r="6" />
       </svg>
       <ol class="etapes">
         <li><span class="label">Amina</span><span class="technique doux">BLE</span></li>
@@ -104,18 +125,14 @@ const transports = [
     <h2 id="titre-fin" class="headline">Prêt avant la prochaine coupure.</h2>
     <p class="body doux">Pour Android 7.0 ou plus récent.</p>
     <div class="boutons">
-      <a class="lgb lg lg-proeminent lgb-grand" href="https://github.com/rito27959-arch/droplet/releases/latest">Télécharger pour Android</a>
-      <a class="lgb lg lgb-grand" href="https://dropletmesh.app/security/">Lire la page sécurité</a>
+      <a class="bouton bouton-principal" href="https://github.com/rito27959-arch/droplet/releases/latest">Télécharger pour Android</a>
+      <a class="bouton bouton-secondaire" href="/produits/messenger/">Découvrir Messenger</a>
     </div>
   </section>
 </Base>
 
 <script>
   import { mountWater } from '../scripts/rain';
-  import { lensAll } from '../scripts/liquid';
-  document.querySelectorAll<HTMLElement>('.lgb').forEach((el) => (el.dataset.lens = 'bord'));
-  lensAll();
-
   const canvas = document.querySelector<HTMLCanvasElement>('.vitre-eau');
   if (canvas) {
     const ok = mountWater(canvas, { dark: '/images/vitre-sombre.jpg', light: '/images/vitre-clair.jpg' }, () => ({
@@ -127,38 +144,6 @@ const transports = [
     if (!ok) canvas.remove();
   }
 
-  // Le trajet du message : un seul mouvement, joué quand la figure entre à l'écran.
-  const fig = document.querySelector<SVGSVGElement>('.parcours svg');
-  const path = fig?.querySelector<SVGPathElement>('.trajet');
-  const drop = fig?.querySelector<SVGCircleElement>('.goutte');
-  if (fig && path && drop) {
-    const len = path.getTotalLength();
-    const place = (t: number) => {
-      const p = path.getPointAtLength(len * t);
-      drop.setAttribute('cx', String(p.x));
-      drop.setAttribute('cy', String(p.y));
-    };
-    place(0);
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let played = false;
-    new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting || played) return;
-      played = true;
-      if (reduce) return place(1);
-      const start = performance.now();
-      const dur = 2600;
-      const tick = (now: number) => {
-        const k = Math.min((now - start) / dur, 1);
-        // Pause à chaque relais : le message attend, puis repart.
-        const seg = Math.min(Math.floor(k * 3), 2);
-        const local = k * 3 - seg;
-        const ease = local < 0.75 ? 1 - Math.pow(1 - local / 0.75, 3) : 1;
-        place(Math.min((seg + ease) / 3, 1));
-        if (k < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    }, { threshold: 0.6 }).observe(fig);
-  }
 </script>
 
 <style>
@@ -222,6 +207,10 @@ const transports = [
     margin-top: var(--e-6);
     pointer-events: auto;
   }
+  .vitre .bouton-secondaire {
+    background: color-mix(in srgb, var(--fond) 72%, transparent);
+    border-color: color-mix(in srgb, var(--encre) 20%, transparent);
+  }
   .indice {
     margin: var(--e-5) 0 0;
   }
@@ -237,6 +226,58 @@ const transports = [
   .intro .body {
     max-width: 60ch;
     margin: 0;
+  }
+
+  .produits {
+    list-style: none;
+    margin: var(--e-7) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--trait);
+  }
+  .produit {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) 11rem 8rem;
+    gap: var(--e-5);
+    align-items: baseline;
+    padding: var(--e-5) 0;
+    border-bottom: 1px solid var(--trait);
+    text-decoration: none;
+  }
+  .produit-nom {
+    transition: transform 200ms var(--sortie);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    a.produit:hover .produit-nom {
+      transform: translateX(6px);
+    }
+  }
+  .produit-lien {
+    justify-self: end;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+  }
+  .sans-page .produit-nom,
+  .sans-page .produit-lien {
+    color: var(--encre-douce);
+    text-decoration: none;
+  }
+  @media (max-width: 760px) {
+    .produit {
+      grid-template-columns: 1fr auto;
+      gap: 6px var(--e-4);
+    }
+    .produit-phrase {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .produit-plateforme {
+      grid-row: 3;
+    }
+    .produit-lien {
+      grid-row: 1;
+      grid-column: 2;
+    }
   }
 
   .parcours {
@@ -266,10 +307,6 @@ const transports = [
     fill: var(--fond);
     stroke: var(--encre);
     stroke-width: 1.5;
-  }
-  .goutte {
-    fill: var(--encre);
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--encre) 45%, transparent));
   }
   .etapes {
     list-style: none;
@@ -338,16 +375,9 @@ const transports = [
     max-width: 52ch;
   }
 
-  /* Le dernier appel se pose sur un fond vivant : le verre a besoin de quelque chose à courber. */
   .fin {
-    width: auto;
-    margin: var(--e-9) var(--gouttiere) 0;
-    padding: var(--e-9) max(var(--gouttiere), calc((100% - var(--largeur)) / 2)) var(--e-9);
-    border-radius: 40px;
-    background: url('/images/papier-clair.jpg') center / cover;
-  }
-  :root[data-theme='dark'] .fin {
-    background-image: url('/images/papier-sombre.jpg');
+    display: grid;
+    justify-items: start;
   }
   .fin .body {
     margin: var(--e-4) 0 0;
