@@ -1,0 +1,168 @@
+/* Verre liquide Droplet.
+   Une seule matière pour tous les contrôles : elle courbe la lumière à son bord,
+   s'assombrit légèrement sur sa tranche, attrape un reflet du côté de la lumière,
+   et se déforme comme un liquide quand on la touche.
+
+   Réglage global, comme le curseur de transparence d'iOS 27 :
+   --lg-voile  0 = très clair … 1 = teinté. */
+
+:root {
+  --lg-voile: 0.22;
+  --lg-contraste: 0;
+  --lg-angle: 215deg;
+  --lg-teinte: 250 251 252;
+  --lg-encre: 14 18 22;
+  --lg-ombre: 0 12px 32px -8px rgb(14 18 22 / 0.22), 0 2px 6px rgb(14 18 22 / 0.08);
+  --lg-lum: 1.06;
+}
+:root[data-theme='dark'] {
+  --lg-teinte: 24 28 34;
+  --lg-encre: 240 243 246;
+  --lg-ombre: 0 14px 36px -8px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
+  --lg-lum: 0.92;
+}
+
+/* Le verre : presque transparent, la couleur vient de ce qu'il y a dessous.
+   La réfraction (filtre) et les reflets (image calculée) sont posés par liquid.ts. */
+.lg {
+  --lg-fond: rgb(var(--lg-teinte) / calc(0.03 + var(--lg-voile) * 0.62 + var(--lg-contraste) * 0.25));
+  --lg-flou: calc(0.6px + var(--lg-voile) * 12px);
+  position: relative;
+  isolation: isolate;
+  color: rgb(var(--lg-encre));
+  background: var(--lg-fond);
+  -webkit-backdrop-filter: blur(var(--lg-flou)) saturate(1.7) brightness(var(--lg-lum));
+  backdrop-filter: var(--lg-filtre,) blur(var(--lg-flou)) saturate(1.7) brightness(var(--lg-lum));
+  box-shadow:
+    var(--lg-ombre),
+    inset 0 0 0 0.5px rgb(255 255 255 / calc(0.32 + var(--lg-contraste) * 0.3)),
+    inset 0 0 0 1px rgb(0 0 0 / calc(0.04 + var(--lg-contraste) * 0.25));
+  transition:
+    background-color 260ms var(--courbe-standard),
+    box-shadow 260ms var(--courbe-standard);
+}
+:root[data-theme='dark'] .lg {
+  box-shadow:
+    var(--lg-ombre),
+    inset 0 0 0 0.5px rgb(255 255 255 / calc(0.16 + var(--lg-contraste) * 0.35)),
+    inset 0 0 0 1px rgb(0 0 0 / 0.3);
+}
+/* Reflets calculés depuis la forme : bord éclairé en haut à gauche, contre-reflet
+   en bas à droite, tranche assombrie. Sous le contenu, au-dessus du verre. */
+.lg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--lg-reflet, none) 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+  z-index: -1;
+}
+:root[data-theme='dark'] .lg::before {
+  opacity: 0.75;
+}
+
+/* Variantes */
+.lg-clair {
+  --lg-fond: rgb(var(--lg-teinte) / calc(0.0 + var(--lg-voile) * 0.2));
+  --lg-flou: 0px;
+}
+.lg-proeminent {
+  --lg-fond: rgb(var(--lg-encre) / calc(0.78 + var(--lg-voile) * 0.15));
+  color: rgb(var(--lg-teinte));
+}
+:root[data-theme='dark'] .lg-proeminent {
+  color: rgb(14 18 22);
+}
+.lg-opaque {
+  --lg-fond: rgb(var(--lg-teinte) / 0.94);
+}
+
+/* Boutons */
+.lgb {
+  --h: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--h);
+  min-width: var(--h);
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  font: 600 15px/1 'Commissioner', system-ui, sans-serif;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transform: scale(var(--appui, 1));
+  transition: transform 380ms var(--courbe-ressort), background-color 200ms;
+}
+.lgb:active {
+  --appui: 1.06;
+}
+.lgb-icone {
+  padding: 0;
+  width: var(--h);
+}
+.lgb-petit {
+  --h: 36px;
+  padding-inline: 14px;
+  font-size: 14px;
+}
+.lgb-grand {
+  --h: 56px;
+  padding-inline: 26px;
+  font-size: 17px;
+}
+.lgb-tres-grand {
+  --h: 68px;
+  padding-inline: 34px;
+  font-size: 19px;
+}
+.lgb.lgb-icone {
+  padding: 0;
+  width: var(--h);
+}
+.lgb[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  --appui: 1;
+}
+.lgb svg {
+  flex: none;
+}
+
+/* Un groupe partage un seul morceau de verre (barres d'outils). */
+.lg-groupe {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px;
+}
+.lg-groupe > button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: inherit;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.lg-groupe > button:active {
+  background: rgb(var(--lg-encre) / 0.1);
+}
+
+.lg-proeminent svg,
+.lg-proeminent {
+  stroke: currentColor;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .lg {
+    --lg-voile: 1 !important;
+  }
+}

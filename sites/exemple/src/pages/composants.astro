@@ -1,714 +1,1253 @@
 ---
 import Base from '../layouts/Base.astro';
 
-const couleurs = [
-  { nom: 'fond', role: 'Le fond de page' },
-  { nom: 'surface', role: 'Zones posées sur le fond' },
-  { nom: 'surface-haute', role: 'Ce qui se détache : champs, bulles' },
-  { nom: 'encre', role: 'Texte, et action en attendant la décision G3' },
-  { nom: 'encre-douce', role: 'Texte secondaire' },
-  { nom: 'trait', role: 'Filets, bords de contrôle' },
-];
-const echelle = [
-  { role: 'Display', cls: 'display', taille: '56 / 60, Flair 80', texte: 'Une goutte' },
-  { role: 'Headline', cls: 'headline', taille: '40 / 44, Flair 70', texte: 'Passe partout' },
-  { role: 'Title', cls: 'title', taille: '28 / 34, Flair 50', texte: 'Discussions' },
-  { role: 'Subtitle', cls: 'subtitle', taille: '20 / 26, Flair 20', texte: 'Relayé par trois téléphones' },
-  { role: 'Body', cls: 'body', taille: '16 / 24', texte: 'Le message attend sur le téléphone et part dès qu’un appareil passe à portée.' },
-  { role: 'Label', cls: 'label', taille: '14 / 20', texte: 'Envoyer' },
-  { role: 'Caption', cls: 'caption', taille: '12 / 16', texte: 'Vu à 17 h 04' },
-  { role: 'Technique', cls: 'technique', taille: 'Martian Mono 13 / 20', texte: 'AES-256-GCM 0x4F2A 5 sauts' },
-];
+const i = {
+  plus: 'M12 5v14M5 12h14',
+  partager: 'M12 15V4M8 8l4-4 4 4M6 12v7h12v-7',
+  plume: 'M4 20h4L19 9l-4-4L4 16v4Z',
+  plusieurs: 'M6 12h.01M12 12h.01M18 12h.01',
+  retour: 'M15 5l-7 7 7 7',
+  chercher: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm5-2 4 4',
+  discussions: 'M4 5h16v11H8l-4 4Z',
+  appels: 'M6 3h3l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2Z',
+  autour: 'M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M6 12a6 6 0 0 1 12 0M3 12a9 9 0 0 1 18 0',
+  profil: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0',
+  copier: 'M8 8h11v11H8zM5 16V5h11',
+  epingler: 'M12 17v4M8 3h8l-1 6 3 4H6l3-4Z',
+  muet: 'M11 5 6 9H3v6h3l5 4V5ZM22 9l-6 6M16 9l6 6',
+  supprimer: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
+  annuler: 'M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3',
+  retablir: 'M15 14l5-5-5-5M20 9H9a5 5 0 0 0 0 10h3',
+  photo: 'M4 7h4l2-3h4l2 3h4v12H4ZM12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z',
+};
+const Icone = (d: string, taille = 20) =>
+  `<svg width="${taille}" height="${taille}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+
 const discussions = [
-  { nom: 'Amina Ndzie', apercu: 'Je viens vers toi', heure: '17:04', relais: 0, nonlu: 2 },
-  { nom: 'Famille', apercu: 'Papa : au marché à 17 h', heure: '16:38', relais: 2, nonlu: 0 },
-  { nom: 'Bilal Kamga', apercu: 'La photo du chantier', heure: '15:12', relais: 3, nonlu: 0 },
+  { nom: 'Amina Ndzie', apercu: 'Je viens vers toi', heure: '17:04', teinte: 'linear-gradient(135deg,#7aa7ff,#c38bff)' },
+  { nom: 'Famille', apercu: 'Papa : au marché à 17 h', heure: '16:38', teinte: 'linear-gradient(135deg,#ffb36b,#ff6f91)' },
+  { nom: 'Bilal Kamga', apercu: 'La photo du chantier', heure: '15:12', teinte: 'linear-gradient(135deg,#5fe0c2,#3d8bff)' },
+  { nom: 'Léa', apercu: 'Merci !', heure: '14:50', teinte: 'linear-gradient(135deg,#ff8fb1,#ffd36e)' },
+  { nom: 'Cours de maths', apercu: 'Exercice 4 corrigé', heure: '12:31', teinte: 'linear-gradient(135deg,#a1ffce,#4fa3ff)' },
+  { nom: 'Chantier Mvan', apercu: 'Relayé par 3 téléphones', heure: '11:02', teinte: 'linear-gradient(135deg,#c9b6ff,#6a7dff)' },
+  { nom: 'Voisins', apercu: 'Coupure jusqu’à 20 h', heure: 'Hier', teinte: 'linear-gradient(135deg,#ffd36e,#ff8a5b)' },
+  { nom: 'Club de foot', apercu: 'Match samedi 9 h', heure: 'Hier', teinte: 'linear-gradient(135deg,#79f0a3,#2bb3c0)' },
+  { nom: 'Mama', apercu: 'Appelle quand tu peux', heure: 'Lun.', teinte: 'linear-gradient(135deg,#ff9a9e,#fad0c4)' },
 ];
 const onglets = [
-  { label: 'Discussions', icone: 'M4 5h16v11H8l-4 4Z' },
-  { label: 'Appels', icone: 'M6 3h3l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 5a2 2 0 0 1 2-2Z' },
-  { label: 'Autour', icone: 'M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M6 12a6 6 0 0 1 12 0M3 12a9 9 0 0 1 18 0' },
-  { label: 'Profil', icone: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0' },
+  { label: 'Discussions', d: i.discussions },
+  { label: 'Appels', d: i.appels },
+  { label: 'Autour', d: i.autour },
+  { label: 'Profil', d: i.profil },
 ];
 ---
-<Base
-  title="Composants — Droplet Design Language"
-  description="Les composants du Droplet Design Language, dans leurs états."
-  current="composants"
->
+<Base title="Composants — verre liquide Droplet" description="Tous les composants du Droplet Design Language, en verre liquide." current="composants">
+  <div class="papier" aria-hidden="true"></div>
+
   <header class="tete conteneur">
     <h1 class="display">Composants</h1>
-    <p class="body doux">
-      Chaque composant dans ses états, en clair et en sombre. La matière en verre n’apparaît que deux fois : la barre du haut
-      et la barre d’onglets. Tout le reste reste calme.
+    <p class="chapo">
+      Tous les contrôles sont faits d’une même matière : un verre liquide qui courbe la lumière à son bord, attrape un reflet
+      du côté de la lumière et se déforme quand on le touche. Bougez la souris, appuyez, faites glisser.
     </p>
+
+    <div class="reglage lg" data-lens>
+      <div class="reglage-ligne">
+        <span class="label">Verre</span>
+        <span class="caption">Très clair</span>
+        <div class="lgc" role="slider" tabindex="0" aria-label="Transparence du verre" aria-valuemin="0" aria-valuemax="100" aria-valuenow="35" data-voile>
+          <span class="lgc-piste"><span class="lgc-rempli"></span></span>
+          <span class="lgc-pouce lg"></span>
+        </div>
+        <span class="caption">Teinté</span>
+      </div>
+      <button class="lgs" type="button" role="switch" aria-checked="false" data-contraste>
+        <span class="label">Augmenter le contraste</span>
+        <span class="lgs-piste"><span class="lgs-pouce lg"></span></span>
+      </button>
+    </div>
   </header>
 
-  <section class="bloc conteneur" aria-labelledby="c-couleur">
-    <h2 id="c-couleur" class="title">Couleur</h2>
-    <p class="body doux note">
-      Neutres froids et une seule encre. La couleur d’action n’est pas encore choisie (décision G3) : l’encre en tient lieu.
-    </p>
-    <ul class="nuancier">
-      {couleurs.map((c) => (
-        <li>
-          <span class="pastille" style={`background: var(--${c.nom})`}></span>
-          <span class="technique">--{c.nom}</span>
-          <span class="caption">{c.role}</span>
-        </li>
-      ))}
-    </ul>
-  </section>
-
-  <section class="bloc conteneur" aria-labelledby="c-type">
-    <h2 id="c-type" class="title">Typographie</h2>
-    <p class="body doux note">Commissioner pour l’interface, son axe Flair évase les fins de traits en titre. Martian Mono pour les données.</p>
-    <dl class="echelle">
-      {echelle.map((e) => (
-        <div>
-          <dt><span class="label">{e.role}</span><span class="technique doux">{e.taille}</span></dt>
-          <dd class={e.cls}>{e.texte}</dd>
-        </div>
-      ))}
-    </dl>
-    <div class="flair">
-      <label class="label" for="flair">Axe Flair</label>
-      <input id="flair" type="range" min="0" max="100" value="80" />
-      <output class="technique" for="flair">80</output>
-      <p class="flair-demo" aria-live="off">Droplet</p>
-    </div>
-  </section>
-
-  <section class="bloc conteneur" aria-labelledby="c-boutons">
-    <h2 id="c-boutons" class="title">Boutons</h2>
-    <div class="rangee">
-      <button class="bouton bouton-principal" type="button">Envoyer</button>
-      <button class="bouton bouton-secondaire" type="button">Joindre un fichier</button>
-      <button class="bouton bouton-discret" type="button">Annuler</button>
-      <button class="bouton bouton-principal" type="button" disabled>Envoyer</button>
-      <button class="bouton bouton-principal bouton-petit" type="button">Petit</button>
-    </div>
-  </section>
-
-  <section class="bloc conteneur" aria-labelledby="c-champs">
-    <h2 id="c-champs" class="title">Champs</h2>
-    <div class="grille-2">
-      <div class="champ">
-        <label class="label" for="nom">Nom affiché</label>
-        <input id="nom" type="text" value="Amina" autocomplete="off" />
-        <p class="caption">Visible par les personnes à portée.</p>
+  <div class="conteneur plan">
+    <section class="bloc" aria-labelledby="t-boutons">
+      <h2 id="t-boutons" class="title">Boutons</h2>
+      <div class="rangee">
+        <button class="lgb lg" type="button">Verre</button>
+        <button class="lgb lg lg-proeminent" type="button">Proéminent</button>
+        <button class="lgb lg lg-clair" type="button">Clair</button>
+        <button class="lgb lg" type="button" disabled>Indisponible</button>
       </div>
-      <div class="champ champ-erreur">
-        <label class="label" for="code">Code de jumelage</label>
-        <input id="code" class="technique-input" type="text" value="4F2A-9" aria-invalid="true" aria-describedby="code-err" />
-        <p class="caption" id="code-err">Le code a 8 caractères. Vérifiez l’écran de l’autre téléphone.</p>
+      <div class="rangee">
+        <button class="lgb lg lgb-petit" type="button">Petit</button>
+        <button class="lgb lg" type="button">Normal</button>
+        <button class="lgb lg lgb-grand" type="button">Grand</button>
+        <button class="lgb lg lg-proeminent lgb-tres-grand" type="button">Très grand</button>
       </div>
-    </div>
-  </section>
+      <div class="rangee">
+        <button class="lgb lg lgb-icone" type="button" aria-label="Nouveau message" set:html={Icone(i.plume)} />
+        <button class="lgb lg lgb-icone" type="button" aria-label="Partager" set:html={Icone(i.partager)} />
+        <button class="lgb lg lg-proeminent lgb-icone lgb-grand" type="button" aria-label="Ajouter" set:html={Icone(i.plus, 24)} />
+        <button class="lgb lg" type="button"><Fragment set:html={Icone(i.photo, 18)} /> Envoyer une photo</button>
+      </div>
+    </section>
 
-  <section class="bloc conteneur" aria-labelledby="c-choix">
-    <h2 id="c-choix" class="title">Choix</h2>
-    <div class="grille-2">
-      <div class="pile">
-        <button class="interrupteur" type="button" role="switch" aria-checked="true" data-switch>
+    <section class="bloc" aria-labelledby="t-choix">
+      <h2 id="t-choix" class="title">Interrupteurs, curseurs, pas à pas</h2>
+      <div class="pile lg plaque" data-lens>
+        <button class="lgs" type="button" role="switch" aria-checked="true">
           <span class="label">Servir de relais</span>
-          <span class="piste" aria-hidden="true"><span class="bouton-rond"></span></span>
+          <span class="lgs-piste"><span class="lgs-pouce lg"></span></span>
         </button>
-        <button class="interrupteur" type="button" role="switch" aria-checked="false" data-switch>
+        <button class="lgs" type="button" role="switch" aria-checked="false">
           <span class="label">Économiser la batterie</span>
-          <span class="piste" aria-hidden="true"><span class="bouton-rond"></span></span>
+          <span class="lgs-piste"><span class="lgs-pouce lg"></span></span>
         </button>
-      </div>
-      <div class="pile">
-        <div class="segmente" role="radiogroup" aria-label="Portée de découverte" data-segmented>
-          <button type="button" role="radio" aria-checked="false">Proche</button>
-          <button type="button" role="radio" aria-checked="true">Normale</button>
-          <button type="button" role="radio" aria-checked="false">Maximale</button>
-          <span class="curseur" aria-hidden="true"></span>
-        </div>
-        <div class="puces" role="group" aria-label="Filtres">
-          <button class="puce" type="button" aria-pressed="true">Non lus</button>
-          <button class="puce" type="button" aria-pressed="false">Groupes</button>
-          <button class="puce" type="button" aria-pressed="false">En attente d’envoi</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bloc conteneur" aria-labelledby="c-messages">
-    <h2 id="c-messages" class="title">Discussions et messages</h2>
-    <div class="grille-2">
-      <ul class="liste">
-        {discussions.map((d) => (
-          <li>
-            <a class="ligne" href="#c-messages">
-              <span class="avatar" aria-hidden="true">{d.nom.slice(0, 1)}</span>
-              <span class="ligne-texte">
-                <span class="label">{d.nom}</span>
-                <span class="caption">{d.apercu}</span>
-              </span>
-              <span class="ligne-meta">
-                <span class="technique doux">{d.heure}</span>
-                {d.nonlu > 0 ? <span class="badge" aria-label={`${d.nonlu} non lus`}>{d.nonlu}</span> :
-                  d.relais > 0 ? <span class="caption">{d.relais} relais</span> : null}
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-      <div class="fil" aria-label="Exemple de conversation">
-        <p class="bulle entrante">Le réseau est tombé ici. Tu me reçois&nbsp;?</p>
-        <p class="bulle sortante">Oui, par deux relais. J’arrive dans dix minutes.</p>
-        <p class="caption etat">Remis à 17:06, relayé par 2 téléphones</p>
-        <p class="bulle sortante attente">Je prends du pain en passant.</p>
-        <p class="caption etat">En attente : personne à portée pour l’instant</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="bloc conteneur" aria-labelledby="c-barre">
-    <h2 id="c-barre" class="title">Barre d’onglets en verre</h2>
-    <p class="body doux note">
-      La seule matière du contenu, posée sur ce qui défile. Le verre dévie la lumière à son bord ; la lentille de sélection
-      glisse d’un onglet à l’autre.
-    </p>
-    <div class="scene">
-      <div class="scene-contenu" aria-hidden="true">
-        {Array.from({ length: 10 }, (_, i) => (
-          <div class="scene-ligne">
-            <span class="avatar">{'ABFLCMNSTR'[i]}</span>
-            <span class="scene-barres"><span></span><span></span></span>
+        <div class="ligne-curseur">
+          <span class="label">Portée</span>
+          <div class="lgc" role="slider" tabindex="0" aria-label="Portée de découverte" aria-valuemin="10" aria-valuemax="200" aria-valuenow="90" data-unit="m" data-affiche="portee">
+            <span class="lgc-piste"><span class="lgc-rempli"></span></span>
+            <span class="lgc-pouce lg"></span>
           </div>
-        ))}
+          <output class="technique" id="portee">90 m</output>
+        </div>
+        <div class="ligne-curseur">
+          <span class="label">Sauts maximum</span>
+          <div class="lgp lg" data-min="1" data-max="5">
+            <button type="button" aria-label="Un saut de moins" set:html={Icone('M5 12h14', 18)} />
+            <output class="technique" aria-live="polite">5</output>
+            <button type="button" aria-label="Un saut de plus" set:html={Icone(i.plus, 18)} />
+          </div>
+        </div>
       </div>
-      <nav class="onglets verre" aria-label="Exemple de barre d’onglets" data-tabs>
-        <span class="lentille" aria-hidden="true"></span>
-        {onglets.map((o, i) => (
-          <button type="button" class="onglet" aria-current={i === 0 ? 'page' : undefined}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d={o.icone} /></svg>
-            <span>{o.label}</span>
-          </button>
-        ))}
-      </nav>
-    </div>
-  </section>
+    </section>
 
-  <section class="bloc conteneur" aria-labelledby="c-retour">
-    <h2 id="c-retour" class="title">Retour d’action</h2>
-    <div class="rangee">
-      <button class="bouton bouton-secondaire" type="button" data-toast>Copier le lien d’invitation</button>
+    <section class="bloc" aria-labelledby="t-segmente">
+      <h2 id="t-segmente" class="title">Contrôle segmenté et puces</h2>
+      <div class="segmente lg" role="radiogroup" aria-label="Afficher" data-segmente>
+        <span class="lentille lg lg-clair" aria-hidden="true"></span>
+        <button type="button" role="radio" aria-checked="true">Tout</button>
+        <button type="button" role="radio" aria-checked="false">Non lus</button>
+        <button type="button" role="radio" aria-checked="false">Groupes</button>
+        <button type="button" role="radio" aria-checked="false">En attente</button>
+      </div>
+      <div class="rangee" role="group" aria-label="Filtres">
+        <button class="lgb lg lgb-petit puce" type="button" aria-pressed="true">Proches</button>
+        <button class="lgb lg lgb-petit puce" type="button" aria-pressed="false">Chiffrés</button>
+        <button class="lgb lg lgb-petit puce" type="button" aria-pressed="false">Avec fichiers</button>
+      </div>
+    </section>
+
+    <section class="bloc" aria-labelledby="t-champs">
+      <h2 id="t-champs" class="title">Champs</h2>
+      <label class="champ lg" data-lens>
+        <span class="caption">Nom affiché</span>
+        <input type="text" value="Amina" autocomplete="off" />
+      </label>
+      <label class="recherche lg" data-lens>
+        <Fragment set:html={Icone(i.chercher, 18)} />
+        <input type="search" placeholder="Rechercher une discussion" aria-label="Rechercher une discussion" />
+      </label>
+      <label class="champ lg erreur" data-lens>
+        <span class="caption">Code de jumelage</span>
+        <input type="text" class="technique" value="4F2A-9" aria-invalid="true" aria-describedby="err-code" />
+        <span class="caption" id="err-code">Le code a 8 caractères. Vérifiez l’écran de l’autre téléphone.</span>
+      </label>
+    </section>
+
+    <section class="bloc" aria-labelledby="t-outils">
+      <h2 id="t-outils" class="title">Barre d’outils, menu, popover</h2>
+      <p class="note">Les actions proches partagent le même morceau de verre. Le menu naît du bouton qui l’ouvre.</p>
+      <div class="outils hote">
+        <div class="lg-groupe lg">
+          <button type="button" aria-label="Annuler" set:html={Icone(i.annuler)} />
+          <button type="button" aria-label="Rétablir" set:html={Icone(i.retablir)} />
+        </div>
+        <div class="lg-groupe lg">
+          <button type="button" aria-label="Partager" set:html={Icone(i.partager)} />
+          <button type="button" aria-label="Plus d’actions" data-menu="menu-outils" set:html={Icone(i.plusieurs, 22)} />
+        </div>
+        <button class="lgb lg" type="button" data-menu="pop-info">Infos du relais</button>
+
+        <div class="menu lg" id="menu-outils" role="menu" aria-label="Actions" hidden>
+          <button role="menuitem" type="button"><Fragment set:html={Icone(i.copier, 18)} />Copier</button>
+          <button role="menuitem" type="button"><Fragment set:html={Icone(i.epingler, 18)} />Épingler</button>
+          <button role="menuitem" type="button"><Fragment set:html={Icone(i.muet, 18)} />Mettre en sourdine</button>
+          <hr />
+          <button role="menuitem" type="button" class="danger"><Fragment set:html={Icone(i.supprimer, 18)} />Supprimer</button>
+        </div>
+        <div class="menu pop lg" id="pop-info" role="dialog" aria-label="Infos du relais" hidden>
+          <p class="subtitle">Relais actif</p>
+          <dl class="technique">
+            <div><dt>Voisins</dt><dd>3</dd></div>
+            <div><dt>Messages transmis</dt><dd>128</dd></div>
+            <div><dt>Batterie utilisée</dt><dd>2 %</dd></div>
+          </dl>
+          <button class="lgb lg lgb-petit" type="button" data-ferme>Fermer</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="bloc" aria-labelledby="t-liste">
+      <h2 id="t-liste" class="title">Listes groupées</h2>
+      <ul class="groupe lg" data-lens>
+        <li><span>Notifications</span><span class="doux">Activées</span></li>
+        <li><span>Confidentialité</span><span class="doux">Contacts</span></li>
+        <li><span>Stockage</span><span class="technique doux">1,2 Go</span></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="conteneur demo" aria-labelledby="t-demo">
+    <div class="demo-texte">
+      <h2 id="t-demo" class="headline">Dans une app</h2>
+      <p class="chapo">
+        Faites défiler la liste : la barre d’onglets se réduit, puis revient. Le bouton crayon ouvre une feuille, que l’on
+        tire vers le haut. Le bouton partager fait naître une feuille d’action. La loupe ouvre la recherche.
+      </p>
     </div>
-    <div class="toast" role="status" aria-live="polite"></div>
+
+    <div class="telephone">
+      <div class="ecran" data-ecran>
+        <div class="defile" data-defile>
+          <h3 class="grand-titre">Discussions</h3>
+          <ul class="convs">
+            {discussions.map((d) => (
+              <li>
+                <span class="photo" style={`background:${d.teinte}`}>{d.nom.slice(0, 1)}</span>
+                <span class="conv-texte"><span class="label">{d.nom}</span><span class="caption">{d.apercu}</span></span>
+                <span class="technique doux heure">{d.heure}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="bord-defilement" data-bord aria-hidden="true"></div>
+
+        <div class="barre-haut">
+          <div class="lg-groupe lg">
+            <button type="button" aria-label="Partager l’invitation" data-action-sheet set:html={Icone(i.partager)} />
+            <button type="button" aria-label="Nouveau message" data-ouvre-feuille set:html={Icone(i.plume)} />
+          </div>
+        </div>
+
+        <nav class="onglets" aria-label="Onglets de l’app">
+          <div class="onglets-barre lg" data-onglets>
+            <span class="lentille lg lg-clair" aria-hidden="true"></span>
+            {onglets.map((o, k) => (
+              <button type="button" class="onglet" aria-current={k === 0 ? 'page' : undefined}>
+                <Fragment set:html={Icone(o.d, 22)} />
+                <span>{o.label}</span>
+              </button>
+            ))}
+          </div>
+          <button class="onglet-recherche lg lgb lgb-icone" type="button" aria-label="Rechercher" data-recherche set:html={Icone(i.chercher, 22)} />
+          <label class="recherche-ouverte lg" data-recherche-champ hidden>
+            <Fragment set:html={Icone(i.chercher, 18)} />
+            <input type="search" placeholder="Rechercher" aria-label="Rechercher" />
+            <button type="button" class="lgb lg lgb-petit lgb-icone" aria-label="Fermer la recherche" data-recherche-fermer>✕</button>
+          </label>
+        </nav>
+
+        <div class="feuille-action lg" role="menu" aria-label="Partager l’invitation" data-feuille-action hidden>
+          <button role="menuitem" type="button">Copier le lien</button>
+          <button role="menuitem" type="button">Afficher le code QR</button>
+          <button role="menuitem" type="button">Envoyer par Bluetooth</button>
+        </div>
+
+        <div class="voile" data-voile-feuille hidden></div>
+        <div class="feuille lg" role="dialog" aria-modal="true" aria-labelledby="t-feuille" data-feuille hidden>
+          <span class="poignee" aria-hidden="true"></span>
+          <div class="feuille-tete">
+            <button class="lgb lg lgb-petit lgb-icone" type="button" aria-label="Fermer" data-ferme-feuille>✕</button>
+            <h4 id="t-feuille" class="subtitle">Nouveau message</h4>
+            <button class="lgb lg lg-proeminent lgb-petit" type="button" data-alerte>Supprimer</button>
+          </div>
+          <label class="recherche lg">
+            <Fragment set:html={Icone(i.chercher, 18)} />
+            <input type="search" placeholder="À : nom ou numéro" aria-label="Destinataire" />
+          </label>
+          <ul class="convs petite">
+            {discussions.slice(0, 5).map((d) => (
+              <li><span class="photo" style={`background:${d.teinte}`}>{d.nom.slice(0, 1)}</span><span class="label">{d.nom}</span></li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="voile alerte-voile" data-voile-alerte hidden></div>
+        <div class="alerte lg" role="alertdialog" aria-modal="true" aria-labelledby="t-alerte" aria-describedby="d-alerte" data-alerte-boite hidden>
+          <h4 id="t-alerte" class="subtitle">Supprimer le brouillon ?</h4>
+          <p id="d-alerte" class="caption">Le message n’a pas encore été envoyé.</p>
+          <div class="alerte-boutons">
+            <button class="lgb lg" type="button" data-alerte-non>Garder</button>
+            <button class="lgb lg lg-proeminent" type="button" data-alerte-oui>Supprimer</button>
+          </div>
+        </div>
+
+        <div class="toast lg" role="status" aria-live="polite" data-toast></div>
+      </div>
+    </div>
   </section>
 </Base>
 
 <script>
-  // Interrupteurs
-  document.querySelectorAll<HTMLButtonElement>('[data-switch]').forEach((b) =>
-    b.addEventListener('click', () => b.setAttribute('aria-checked', String(b.getAttribute('aria-checked') !== 'true'))),
-  );
+  import { lensAll, followLight, lens, Spring, animate } from '../scripts/liquid';
+  import { initSwitch, initSlider, initLiquidSelect, initStepper, initMorph } from '../scripts/controles';
 
-  // Contrôle segmenté : clavier comme un groupe radio (flèches).
-  document.querySelectorAll<HTMLElement>('[data-segmented]').forEach((g) => {
-    const items = [...g.querySelectorAll<HTMLButtonElement>('[role=radio]')];
-    const cursor = g.querySelector<HTMLElement>('.curseur')!;
-    const select = (i: number, focus = false) => {
-      items.forEach((b, j) => {
-        b.setAttribute('aria-checked', String(i === j));
-        b.tabIndex = i === j ? 0 : -1;
-      });
-      cursor.style.transform = `translateX(${items[i].offsetLeft - 4}px)`;
-      cursor.style.width = `${items[i].offsetWidth}px`;
-      if (focus) items[i].focus();
-    };
-    items.forEach((b, i) => {
-      b.addEventListener('click', () => select(i));
-      b.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') select((i + 1) % items.length, true);
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') select((i - 1 + items.length) % items.length, true);
-      });
-    });
-    const start = items.findIndex((b) => b.getAttribute('aria-checked') === 'true');
-    requestAnimationFrame(() => select(start));
-    addEventListener('resize', () => select(items.findIndex((b) => b.getAttribute('aria-checked') === 'true')));
+  followLight();
+
+  // Réglage global du verre (iOS 27 : de très clair à teinté) et du contraste.
+  const root = document.documentElement;
+  const voileEl = document.querySelector<HTMLElement>('[data-voile]')!;
+  const saved = (() => { try { return localStorage.getItem('voile'); } catch { return null; } })();
+  if (saved) {
+    voileEl.setAttribute('aria-valuenow', saved);
+    root.style.setProperty('--lg-voile', String(Number(saved) / 100));
+  }
+  document.querySelectorAll<HTMLElement>('.lgc').forEach((el) =>
+    initSlider(el, (v) => {
+      if (el.hasAttribute('data-voile')) {
+        root.style.setProperty('--lg-voile', String(v / 100));
+        try { localStorage.setItem('voile', String(v)); } catch {}
+      }
+      const out = el.dataset.affiche ? document.getElementById(el.dataset.affiche) : null;
+      if (out) out.textContent = `${v} ${el.dataset.unit ?? ''}`.trim();
+    }),
+  );
+  document.querySelectorAll<HTMLButtonElement>('.lgs').forEach(initSwitch);
+  document.querySelector('[data-contraste]')?.addEventListener('change', (e) => {
+    root.style.setProperty('--lg-contraste', (e.currentTarget as HTMLElement).getAttribute('aria-checked') === 'true' ? '1' : '0');
   });
 
-  // Puces
+  document.querySelectorAll<HTMLElement>('.lgp').forEach(initStepper);
   document.querySelectorAll<HTMLButtonElement>('.puce').forEach((b) =>
     b.addEventListener('click', () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'))),
   );
 
-  // Axe Flair
-  const flair = document.querySelector<HTMLInputElement>('#flair');
-  const out = document.querySelector<HTMLOutputElement>('output[for=flair]');
-  const demo = document.querySelector<HTMLElement>('.flair-demo');
-  flair?.addEventListener('input', () => {
-    if (out) out.value = flair.value;
-    demo?.style.setProperty('--flair', flair.value);
+  // Contrôle segmenté
+  document.querySelectorAll<HTMLElement>('[data-segmente]').forEach((g) =>
+    initLiquidSelect(g, [...g.querySelectorAll<HTMLElement>('[role=radio]')], g.querySelector('.lentille')!),
+  );
+
+  // Menus et popovers qui naissent de leur bouton
+  document.querySelectorAll<HTMLElement>('[data-menu]').forEach((t) => {
+    const panel = document.getElementById(t.dataset.menu!)!;
+    initMorph(t, panel, { align: t.dataset.menu === 'menu-outils' ? 'fin' : 'debut' });
   });
 
-  // Barre d'onglets : la lentille suit l'onglet choisi, avec un ressort.
-  document.querySelectorAll<HTMLElement>('[data-tabs]').forEach((bar) => {
-    const tabs = [...bar.querySelectorAll<HTMLButtonElement>('.onglet')];
-    const lens = bar.querySelector<HTMLElement>('.lentille')!;
-    const move = (i: number) => {
-      tabs.forEach((t, j) => (j === i ? t.setAttribute('aria-current', 'page') : t.removeAttribute('aria-current')));
-      lens.style.transform = `translateX(${tabs[i].offsetLeft}px)`;
-      lens.style.width = `${tabs[i].offsetWidth}px`;
-    };
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => move(i));
-      t.addEventListener('pointerdown', () => lens.classList.add('appui'));
-    });
-    addEventListener('pointerup', () => lens.classList.remove('appui'));
-    requestAnimationFrame(() => move(0));
-    addEventListener('resize', () => move(Math.max(0, tabs.findIndex((t) => t.hasAttribute('aria-current')))));
+  // Tous les verres reçoivent leur réfraction de bord (Chromium).
+  document.querySelectorAll<HTMLElement>('.lgb, .lg-groupe, .segmente, .lgp, .onglets-barre, .toast').forEach((el) => {
+    el.dataset.lens = el.dataset.lens || 'bord';
+  });
+  lensAll();
+
+  /* ---------- L'app de démonstration ---------- */
+  const ecran = document.querySelector<HTMLElement>('[data-ecran]')!;
+  const defile = ecran.querySelector<HTMLElement>('[data-defile]')!;
+  const bord = ecran.querySelector<HTMLElement>('[data-bord]')!;
+  const barre = ecran.querySelector<HTMLElement>('[data-onglets]')!;
+  const nav = ecran.querySelector<HTMLElement>('.onglets')!;
+  initLiquidSelect(barre, [...barre.querySelectorAll<HTMLElement>('.onglet')], barre.querySelector('.lentille')!, undefined, 'aria-current');
+
+  // La barre d'onglets se réduit quand on descend, revient quand on remonte.
+  let last = 0;
+  defile.addEventListener('scroll', () => {
+    const y = defile.scrollTop;
+    bord.classList.toggle('visible', y > 4);
+    if (Math.abs(y - last) < 6) return;
+    nav.classList.toggle('reduite', y > last && y > 40);
+    last = y;
   });
 
-  // Retour d'action : le texte du toast reprend le verbe du bouton.
-  const toast = document.querySelector<HTMLElement>('.toast');
-  let timer = 0;
-  document.querySelector('[data-toast]')?.addEventListener('click', () => {
-    if (!toast) return;
-    toast.textContent = 'Lien d’invitation copié';
+  // Toast
+  const toast = ecran.querySelector<HTMLElement>('[data-toast]')!;
+  let tt = 0;
+  const montrer = (texte: string) => {
+    toast.textContent = texte;
     toast.classList.add('visible');
-    clearTimeout(timer);
-    timer = window.setTimeout(() => toast.classList.remove('visible'), 2400);
+    clearTimeout(tt);
+    tt = window.setTimeout(() => toast.classList.remove('visible'), 2200);
+  };
+
+  // Feuille d'action : naît du bouton partager
+  const sa = ecran.querySelector<HTMLElement>('[data-feuille-action]')!;
+  const saTrigger = ecran.querySelector<HTMLElement>('[data-action-sheet]')!;
+  initMorph(saTrigger, sa, { align: 'fin' });
+  sa.querySelectorAll('button').forEach((b) => b.addEventListener('click', () => montrer(b.textContent === 'Copier le lien' ? 'Lien copié' : 'Fait')));
+
+  // Feuille : à mi-hauteur, décollée des bords ; tirée vers le haut, elle devient opaque.
+  const feuille = ecran.querySelector<HTMLElement>('[data-feuille]')!;
+  const voileF = ecran.querySelector<HTMLElement>('[data-voile-feuille]')!;
+  lens(feuille, { bezel: 18, thickness: 20 });
+  const fy = new Spring(1, 260, 0.82); // 0 plein écran, 0.45 mi-hauteur, 1 fermée
+  let feuilleOuverte = false;
+  const rendreFeuille = () => {
+    const h = ecran.clientHeight;
+    const y = fy.x * h;
+    feuille.style.transform = `translateY(${y}px)`;
+    const plein = 1 - Math.min(Math.max((fy.x - 0.02) / 0.43, 0), 1);
+    feuille.style.setProperty('--plein', String(plein));
+    feuille.classList.toggle('lg-opaque', plein > 0.6);
+    voileF.style.opacity = String(Math.max(0, 1 - fy.x) * 0.5);
+    if (fy.x > 0.99 && !feuilleOuverte) {
+      feuille.hidden = true;
+      voileF.hidden = true;
+    }
+  };
+  const bougerFeuille = (target: number) => {
+    fy.target = target;
+    animate((dt) => {
+      fy.step(dt);
+      rendreFeuille();
+      return !fy.resting;
+    });
+  };
+  const ouvrirFeuille = () => {
+    feuilleOuverte = true;
+    feuille.hidden = false;
+    voileF.hidden = false;
+    bougerFeuille(0.45);
+    setTimeout(() => feuille.querySelector('input')?.focus({ preventScroll: true }), 300);
+  };
+  const fermerFeuille = () => {
+    feuilleOuverte = false;
+    bougerFeuille(1);
+  };
+  ecran.querySelector('[data-ouvre-feuille]')!.addEventListener('click', ouvrirFeuille);
+  ecran.querySelector('[data-ferme-feuille]')!.addEventListener('click', fermerFeuille);
+  voileF.addEventListener('click', fermerFeuille);
+  const poignee = feuille.querySelector<HTMLElement>('.poignee')!;
+  let drag: { y: number; from: number } | null = null;
+  const debutTirer = (e: PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button, input, li')) return;
+    drag = { y: e.clientY, from: fy.x };
+    feuille.setPointerCapture(e.pointerId);
+  };
+  feuille.addEventListener('pointerdown', debutTirer);
+  feuille.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    fy.x = fy.target = Math.min(Math.max(drag.from + (e.clientY - drag.y) / ecran.clientHeight, -0.02), 1);
+    rendreFeuille();
+  });
+  feuille.addEventListener('pointerup', () => {
+    if (!drag) return;
+    const p = fy.x;
+    drag = null;
+    if (p < 0.22) bougerFeuille(0.02);
+    else if (p < 0.7) bougerFeuille(0.45);
+    else fermerFeuille();
+  });
+  poignee.addEventListener('dblclick', () => bougerFeuille(fy.target < 0.2 ? 0.45 : 0.02));
+  ecran.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && feuilleOuverte) fermerFeuille();
+  });
+
+  // Alerte
+  const alerte = ecran.querySelector<HTMLElement>('[data-alerte-boite]')!;
+  const voileA = ecran.querySelector<HTMLElement>('[data-voile-alerte]')!;
+  lens(alerte, { bezel: 16, thickness: 18 });
+  const montrerAlerte = (o: boolean) => {
+    alerte.hidden = voileA.hidden = !o;
+    if (o) {
+      alerte.animate?.([{ transform: 'translate(-50%, -50%) scale(1.15)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(0.34,1.36,0.64,1)' });
+      alerte.querySelector<HTMLElement>('button')?.focus();
+    }
+  };
+  ecran.querySelector('[data-alerte]')!.addEventListener('click', () => montrerAlerte(true));
+  ecran.querySelector('[data-alerte-non]')!.addEventListener('click', () => montrerAlerte(false));
+  ecran.querySelector('[data-alerte-oui]')!.addEventListener('click', () => {
+    montrerAlerte(false);
+    fermerFeuille();
+    montrer('Brouillon supprimé');
+  });
+
+  // Recherche : le bouton loupe s'étire en champ.
+  const rBtn = ecran.querySelector<HTMLElement>('[data-recherche]')!;
+  const rChamp = ecran.querySelector<HTMLElement>('[data-recherche-champ]')!;
+  lens(rChamp);
+  rBtn.addEventListener('click', () => {
+    nav.classList.add('cherche');
+    rChamp.hidden = false;
+    rChamp.animate?.([{ clipPath: 'inset(0 0 0 calc(100% - 52px) round 26px)' }, { clipPath: 'inset(0 0 0 0 round 26px)' }], { duration: 420, easing: 'cubic-bezier(0.34,1.2,0.64,1)' });
+    rChamp.querySelector('input')?.focus({ preventScroll: true });
+  });
+  ecran.querySelector('[data-recherche-fermer]')!.addEventListener('click', () => {
+    nav.classList.remove('cherche');
+    rChamp.hidden = true;
+    rBtn.focus();
   });
 </script>
 
 <style>
+  .papier {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: url('/images/papier-clair.jpg') center / cover;
+  }
+  :root[data-theme='dark'] .papier {
+    background-image: url('/images/papier-sombre.jpg');
+  }
   .tete {
     padding-top: 150px;
     display: grid;
     gap: var(--e-5);
   }
-  .tete .body {
-    max-width: 62ch;
+  .tete .display,
+  .title,
+  .headline {
+    text-shadow: 0 1px 24px rgb(var(--lg-teinte) / 0.6);
+  }
+  .chapo {
+    max-width: 58ch;
     margin: 0;
-  }
-  .bloc {
-    padding-top: var(--e-8);
-    display: grid;
-    gap: var(--e-5);
-  }
-  .bloc > .title {
-    padding-top: var(--e-5);
-    border-top: 1px solid var(--trait);
+    font-size: 17px;
+    line-height: 1.5;
   }
   .note {
     margin: 0;
-    max-width: 62ch;
+    max-width: 58ch;
   }
 
-  .nuancier {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+  .reglage {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: var(--e-5) var(--e-4);
+    gap: var(--e-2);
+    max-width: 560px;
+    padding: 14px 18px;
+    border-radius: 28px;
   }
-  .nuancier li {
+  .reglage-ligne {
     display: grid;
-    gap: 4px;
-  }
-  .pastille {
-    height: 64px;
-    border-radius: var(--r-controle);
-    border: 1px solid var(--trait);
-    margin-bottom: 6px;
-  }
-
-  .echelle {
-    margin: 0;
-    display: grid;
-  }
-  .echelle > div {
-    display: grid;
-    grid-template-columns: 200px 1fr;
-    gap: var(--e-4);
-    align-items: baseline;
-    padding-block: var(--e-4);
-    border-bottom: 1px solid var(--trait);
-  }
-  .echelle dt {
-    display: grid;
-    gap: 2px;
-  }
-  .echelle dd {
-    margin: 0;
-    min-width: 0;
-  }
-  .flair {
-    display: grid;
-    grid-template-columns: auto minmax(120px, 280px) 3ch;
-    justify-content: start;
-    align-items: center;
-    gap: var(--e-3);
-    margin-top: var(--e-4);
-  }
-  .flair input {
-    accent-color: var(--encre);
-  }
-  .flair-demo {
-    grid-column: 1 / -1;
-    margin: 0;
-    font-size: clamp(64px, 12vw, 140px);
-    line-height: 1;
-    font-weight: 660;
-    letter-spacing: -0.03em;
-    font-variation-settings: 'FLAR' var(--flair, 80), 'VOLM' 30;
-  }
-
-  .rangee {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--e-3);
+    grid-template-columns: auto auto 1fr auto;
+    gap: 12px;
     align-items: center;
   }
-  .grille-2 {
+  .reglage .lgs {
+    border-bottom: 0;
+    min-height: 44px;
+  }
+
+  .plan {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--e-6);
+    gap: var(--e-8) var(--e-7);
+    padding-top: var(--e-8);
   }
-  .pile {
+  .bloc {
     display: grid;
     gap: var(--e-4);
     align-content: start;
   }
-
-  .champ {
+  .rangee {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .pile {
     display: grid;
-    gap: 6px;
+    gap: 4px;
   }
-  .champ input {
-    height: 48px;
-    padding: 0 14px;
-    border-radius: var(--r-controle);
-    border: 1px solid var(--trait);
-    background: var(--surface-haute);
-    color: var(--encre);
-    font: 400 16px 'Commissioner', system-ui, sans-serif;
-    transition: border-color var(--duree-courte) var(--courbe-standard);
-  }
-  .champ input:hover {
-    border-color: var(--encre-douce);
-  }
-  .champ input:focus-visible {
-    outline: 2px solid var(--encre);
-    outline-offset: 1px;
-  }
-  .champ p {
-    margin: 0;
-  }
-  .technique-input {
-    font-family: 'Martian Mono', monospace !important;
-    font-size: 14px !important;
-    letter-spacing: 0.04em;
-  }
-  .champ-erreur input {
-    border-color: var(--erreur);
-  }
-  .champ-erreur .caption {
-    color: var(--erreur);
+  .plaque {
+    padding: 8px 18px 14px;
+    border-radius: 28px;
   }
 
-  .interrupteur {
+  /* Interrupteur */
+  .lgs {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--e-4);
+    gap: 16px;
     min-height: 52px;
-    padding: 0 4px 0 0;
+    padding: 0;
     border: 0;
-    border-bottom: 1px solid var(--trait);
+    border-bottom: 1px solid rgb(var(--lg-encre) / 0.1);
     background: none;
-    color: var(--encre);
+    color: inherit;
     cursor: pointer;
+    touch-action: pan-y;
     text-align: left;
   }
-  .piste {
+  .lgs-piste {
+    --rempli: 0;
     position: relative;
-    width: 50px;
-    height: 30px;
-    border-radius: var(--r-pilule);
-    background: var(--trait);
-    transition: background-color var(--duree-moyenne) var(--courbe-standard);
+    flex: none;
+    width: 62px;
+    height: 28px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgb(var(--lg-encre) / 0.88) calc(var(--rempli) * 100%), rgb(var(--lg-encre) / 0.14) 0);
   }
-  .bouton-rond {
+  .lgs-pouce {
     position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 24px;
+    top: 2px;
+    left: 2px;
+    width: 36px;
     height: 24px;
-    border-radius: 50%;
-    background: var(--gris-0);
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
-    transition: transform var(--duree-moyenne) var(--courbe-ressort);
+    border-radius: 999px;
+    --lg-fond: #fff;
+    --lg-flou: 0px;
+    transform-origin: center;
+    will-change: transform;
   }
-  [aria-checked='true'] .piste {
-    background: var(--encre);
-  }
-  :root[data-theme='dark'] [aria-checked='true'] .bouton-rond {
-    background: var(--gris-950);
-  }
-  [aria-checked='true'] .bouton-rond {
-    transform: translateX(20px);
+  .lgs-pouce.verre-actif,
+  .lgc-pouce.verre-actif {
+    --lg-fond: rgb(255 255 255 / 0.12);
+    --lg-flou: 0.5px;
   }
 
+  /* Curseur */
+  .lgc {
+    position: relative;
+    height: 32px;
+    min-width: 120px;
+    cursor: pointer;
+    touch-action: pan-y;
+    border-radius: 999px;
+  }
+  .lgc-piste {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 13px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgb(var(--lg-encre) / 0.16);
+    overflow: hidden;
+  }
+  .lgc-rempli {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: rgb(var(--lg-encre) / 0.85);
+    border-radius: 999px;
+  }
+  .lgc-pouce {
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 40px;
+    height: 28px;
+    border-radius: 999px;
+    --lg-fond: #fff;
+    --lg-flou: 0px;
+    will-change: transform;
+  }
+  .ligne-curseur {
+    display: grid;
+    grid-template-columns: 9rem 1fr auto;
+    gap: 14px;
+    align-items: center;
+    min-height: 56px;
+  }
+  .ligne-curseur output {
+    min-width: 5ch;
+    text-align: right;
+  }
+
+  /* Pas à pas */
+  .lgp {
+    grid-column: 2 / 4;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 2px;
+  }
+  .lgp button {
+    width: 46px;
+    height: 40px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+  .lgp button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .lgp output {
+    min-width: 2ch;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Segmenté */
   .segmente {
     position: relative;
     display: inline-grid;
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
     padding: 4px;
-    border-radius: var(--r-pilule);
-    background: color-mix(in srgb, var(--encre) 7%, transparent);
+    border-radius: 999px;
     justify-self: start;
-    isolation: isolate;
+    touch-action: pan-y;
   }
   .segmente button {
-    height: 36px;
+    position: relative;
+    z-index: 3;
+    height: 40px;
     padding: 0 18px;
     border: 0;
     background: none;
-    color: var(--encre-douce);
+    color: rgb(var(--lg-encre) / 0.7);
     font: 600 14px 'Commissioner', system-ui, sans-serif;
-    border-radius: var(--r-pilule);
     cursor: pointer;
-    transition: color var(--duree-courte);
+    border-radius: 999px;
+    white-space: nowrap;
   }
   .segmente button[aria-checked='true'] {
-    color: var(--encre);
-  }
-  .curseur {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    height: 36px;
-    border-radius: var(--r-pilule);
-    background: var(--surface-haute);
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
-    z-index: -1;
-    transition: transform var(--duree-moyenne) var(--courbe-ressort), width var(--duree-moyenne) var(--courbe-standard);
-  }
-
-  .puces {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--e-2);
-  }
-  .puce {
-    height: 34px;
-    padding: 0 14px;
-    border-radius: var(--r-pilule);
-    border: 1px solid var(--trait);
-    background: none;
-    color: var(--encre);
-    font: 500 14px 'Commissioner', system-ui, sans-serif;
-    cursor: pointer;
-  }
-  .puce[aria-pressed='true'] {
-    background: var(--encre);
-    color: var(--sur-encre);
-    border-color: var(--encre);
-  }
-
-  .liste {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .ligne {
-    display: grid;
-    grid-template-columns: 44px 1fr auto;
-    gap: var(--e-3);
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--trait);
-    text-decoration: none;
-  }
-  .avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: color-mix(in srgb, var(--encre) 9%, transparent);
-    font-weight: 650;
-    font-variation-settings: 'FLAR' 60;
-  }
-  .ligne-texte,
-  .ligne-meta {
-    display: grid;
-    gap: 2px;
-    min-width: 0;
-  }
-  .ligne-meta {
-    justify-items: end;
-  }
-  .badge {
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
-    border-radius: var(--r-pilule);
-    background: var(--encre);
-    color: var(--sur-encre);
-    font: 650 12px/22px 'Commissioner', sans-serif;
-    text-align: center;
-  }
-
-  .fil {
-    display: grid;
-    gap: 6px;
-    align-content: start;
-  }
-  .bulle {
-    margin: 0;
-    max-width: 80%;
-    padding: 10px 14px;
-    border-radius: 20px;
-    line-height: 1.4;
-  }
-  .entrante {
-    justify-self: start;
-    background: var(--surface-haute);
-    border-bottom-left-radius: 6px;
-  }
-  .sortante {
-    justify-self: end;
-    background: var(--encre);
-    color: var(--sur-encre);
-    border-bottom-right-radius: 6px;
-  }
-  .attente {
-    background: transparent;
-    color: var(--encre);
-    border: 1px dashed var(--encre-douce);
-  }
-  .etat {
-    justify-self: end;
-    margin: 0 0 var(--e-2);
-  }
-
-  .scene {
-    position: relative;
-    height: 420px;
-    border-radius: var(--r-feuille);
-    overflow: hidden;
-    background: url('/images/vitre-clair.jpg') center / cover;
-    border: 1px solid var(--trait);
-  }
-  :root[data-theme='dark'] .scene {
-    background-image: url('/images/vitre-sombre.jpg');
-  }
-  .scene-contenu {
-    position: absolute;
-    inset: 0;
-    overflow-y: auto;
-    padding: 24px 24px 120px;
-    display: grid;
-    gap: 10px;
-    align-content: start;
-    scrollbar-width: none;
-  }
-  .scene-ligne {
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 12px;
-    align-items: center;
-    padding: 10px 12px;
-    border-radius: 18px;
-    background: color-mix(in srgb, var(--surface-haute) 82%, transparent);
-  }
-  .scene-barres {
-    display: grid;
-    gap: 6px;
-  }
-  .scene-barres span {
-    height: 9px;
-    width: 62%;
-    border-radius: 5px;
-    background: color-mix(in srgb, var(--encre) 70%, transparent);
-  }
-  .scene-barres span + span {
-    width: 40%;
-    background: color-mix(in srgb, var(--encre) 30%, transparent);
-  }
-  .onglets {
-    position: absolute;
-    left: 50%;
-    bottom: 18px;
-    transform: translateX(-50%);
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    width: min(92%, 380px);
-    padding: 6px;
-    border-radius: var(--r-pilule);
-  }
-  .onglet {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    justify-items: center;
-    gap: 2px;
-    height: 54px;
-    padding: 6px 0 0;
-    border: 0;
-    background: none;
-    color: var(--encre-douce);
-    font: 600 10.5px 'Commissioner', sans-serif;
-    cursor: pointer;
-    border-radius: var(--r-pilule);
-    transition: color var(--duree-courte);
-  }
-  .onglet[aria-current='page'] {
-    color: var(--encre);
+    color: rgb(var(--lg-encre));
   }
   .lentille {
     position: absolute;
-    top: 6px;
+    top: 4px;
     left: 0;
-    height: 54px;
-    border-radius: var(--r-pilule);
-    background: color-mix(in srgb, var(--encre) 10%, transparent);
-    box-shadow: inset 0 1px 0 var(--verre-trait), inset 0 0 0 1px color-mix(in srgb, var(--encre) 8%, transparent);
-    transition: transform 420ms var(--courbe-ressort), width var(--duree-moyenne) var(--courbe-standard), scale var(--duree-courte) var(--courbe-ressort);
+    height: calc(100% - 8px);
+    border-radius: 999px;
+    z-index: 2;
+    --lg-fond: rgb(var(--lg-teinte) / 0.7);
+    will-change: transform, width;
   }
-  .lentille.appui {
-    scale: 1.08 1.12;
+  .lentille.verre-actif {
+    --lg-fond: rgb(var(--lg-teinte) / 0.08);
+  }
+  .puce[aria-pressed='true'] {
+    --lg-fond: rgb(var(--lg-encre) / 0.85);
+    color: rgb(var(--lg-teinte));
+  }
+  :root[data-theme='dark'] .puce[aria-pressed='true'] {
+    color: #0e1216;
+  }
+
+  /* Champs */
+  .champ {
+    display: grid;
+    gap: 2px;
+    padding: 10px 18px 12px;
+    border-radius: 22px;
+    cursor: text;
+  }
+  .champ input,
+  .recherche input {
+    border: 0;
+    background: none;
+    color: inherit;
+    font: 500 17px 'Commissioner', system-ui, sans-serif;
+    padding: 0;
+    outline: none;
+    min-width: 0;
+  }
+  .champ input.technique {
+    font-family: 'Martian Mono', monospace;
+    font-size: 15px;
+  }
+  .champ:focus-within,
+  .recherche:focus-within {
+    box-shadow: var(--lg-ombre), inset 0 0 0 2px rgb(var(--lg-encre) / 0.7);
+  }
+  .erreur {
+    box-shadow: var(--lg-ombre), inset 0 0 0 1.5px var(--erreur);
+  }
+  .erreur .caption:last-child {
+    color: var(--erreur);
+  }
+  .recherche {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 48px;
+    padding: 0 18px;
+    border-radius: 999px;
+    cursor: text;
+  }
+  .recherche input {
+    flex: 1;
+  }
+
+  /* Outils, menus */
+  .hote {
+    position: relative;
+  }
+  .outils {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    min-height: 240px;
+    align-content: start;
+  }
+  .menu {
+    position: absolute;
+    z-index: 20;
+    width: max-content;
+    min-width: 220px;
+    padding: 6px;
+    border-radius: 26px;
+    overflow: hidden;
+    --contenu: 1;
+  }
+  .menu > * {
+    opacity: var(--contenu);
+  }
+  .menu [role='menuitem'] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 11px 14px;
+    border: 0;
+    border-radius: 18px;
+    background: none;
+    color: inherit;
+    font: 500 16px 'Commissioner', system-ui, sans-serif;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+  .menu [role='menuitem']:hover,
+  .menu [role='menuitem']:focus-visible {
+    background: rgb(var(--lg-encre) / 0.08);
+    outline: none;
+  }
+  .menu hr {
+    border: 0;
+    border-top: 1px solid rgb(var(--lg-encre) / 0.12);
+    margin: 4px 10px;
+  }
+  .danger {
+    color: var(--erreur) !important;
+  }
+  .pop {
+    padding: 16px 18px;
+    display: grid;
+    gap: 10px;
+  }
+  .pop p,
+  .pop dl {
+    margin: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .pop dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .pop dd {
+    margin: 0;
+  }
+  .pop .lgb {
+    justify-self: start;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Liste groupée */
+  .groupe {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+    border-radius: 26px;
+  }
+  .groupe li {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 15px 20px;
+  }
+  .groupe li + li {
+    border-top: 1px solid rgb(var(--lg-encre) / 0.1);
+  }
+
+  /* Démonstration */
+  .demo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--e-7);
+    align-items: center;
+    padding-top: var(--e-9);
+  }
+  .demo-texte {
+    display: grid;
+    gap: var(--e-4);
+  }
+  .telephone {
+    width: 390px;
+    max-width: 100%;
+    height: 800px;
+    padding: 12px;
+    border-radius: 60px;
+    background: #0b0d10;
+    box-shadow: 0 40px 80px rgb(0 0 0 / 0.35), inset 0 0 0 2px #2a2f36;
+  }
+  .ecran {
+    position: relative;
+    height: 100%;
+    border-radius: 48px;
+    overflow: hidden;
+    background: var(--fond);
+    color: var(--encre);
+    --lg-angle: 210deg;
+  }
+  .defile {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 64px 16px 120px;
+    scrollbar-width: none;
+  }
+  .grand-titre {
+    margin: 0 4px 12px;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variation-settings: 'FLAR' 60;
+  }
+  .convs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .convs li {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 24px;
+    background: var(--surface-haute);
+  }
+  .photo {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 20px;
+    font-variation-settings: 'FLAR' 80;
+  }
+  .conv-texte {
+    display: grid;
+    min-width: 0;
+  }
+  .heure {
+    align-self: start;
+    font-size: 11px;
+  }
+  .bord-defilement {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 96px;
+    pointer-events: none;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    background: linear-gradient(var(--fond), transparent);
+    -webkit-mask: linear-gradient(#000 45%, transparent);
+    mask: linear-gradient(#000 45%, transparent);
+    opacity: 0;
+    transition: opacity 200ms;
+  }
+  .bord-defilement.visible {
+    opacity: 1;
+  }
+  .barre-haut {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 5;
+  }
+  .onglets {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 22px;
+    z-index: 5;
+    display: flex;
+    gap: 10px;
+    align-items: end;
+  }
+  .onglets-barre {
+    position: relative;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 5px;
+    border-radius: 999px;
+    transition: flex-basis 420ms var(--courbe-ressort), max-width 420ms var(--courbe-ressort);
+    max-width: 100%;
+    touch-action: pan-y;
+  }
+  .onglet {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    justify-items: center;
+    gap: 1px;
+    height: 54px;
+    padding: 7px 0 0;
+    border: 0;
+    background: none;
+    color: rgb(var(--lg-encre) / 0.75);
+    font: 600 10.5px 'Commissioner', sans-serif;
+    border-radius: 999px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: height 300ms var(--courbe-standard);
+  }
+  .onglet[aria-current='page'] {
+    color: rgb(var(--lg-encre));
+  }
+  .onglets-barre .lentille {
+    top: 5px;
+    height: calc(100% - 10px);
+  }
+  .onglet-recherche {
+    --h: 64px;
+    flex: none;
+  }
+  /* Réduite : seul l'onglet actif reste, en petit. */
+  .onglets.reduite .onglets-barre {
+    max-width: 76px;
+  }
+  .onglets.reduite .onglet:not([aria-current='page']) {
+    display: none;
+  }
+  .onglets.reduite .onglets-barre {
+    grid-template-columns: 1fr;
+  }
+  .onglets.reduite .onglet {
+    height: 44px;
+  }
+  .onglets.reduite .onglet span {
+    display: none;
+  }
+  .onglets.reduite .onglet-recherche {
+    --h: 54px;
+  }
+  .onglets.cherche .onglets-barre,
+  .onglets.cherche .onglet-recherche {
+    visibility: hidden;
+  }
+  .recherche-ouverte {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 8px 0 20px;
+    border-radius: 999px;
+  }
+  .recherche-ouverte input {
+    flex: 1;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: 500 17px 'Commissioner', sans-serif;
+    outline: none;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+  }
+  .recherche-ouverte .lgb {
+    z-index: 2;
+  }
+
+  .feuille-action {
+    position: absolute;
+    z-index: 8;
+    width: 250px;
+    padding: 6px;
+    border-radius: 26px;
+    overflow: hidden;
+    --contenu: 1;
+  }
+  .feuille-action > * {
+    opacity: var(--contenu);
+  }
+  .feuille-action button {
+    display: block;
+    width: 100%;
+    padding: 13px 16px;
+    border: 0;
+    border-radius: 20px;
+    background: none;
+    color: inherit;
+    font: 500 16px 'Commissioner', sans-serif;
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+  }
+  .feuille-action button:hover,
+  .feuille-action button:focus-visible {
+    background: rgb(var(--lg-encre) / 0.08);
+    outline: none;
+  }
+
+  /* Les grandes surfaces posées sur du contenu (feuilles, alertes, menus) :
+     plus de flou et un voile plus dense, pour que le texte dessous ne gêne pas la lecture. */
+  .feuille,
+  .alerte,
+  .menu,
+  .feuille-action {
+    --lg-flou: 26px;
+    --lg-fond: rgb(var(--lg-teinte) / calc(0.42 + var(--lg-voile) * 0.4));
+  }
+  .voile {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    background: #000;
+    opacity: 0;
+  }
+  .feuille {
+    --plein: 0;
+    position: absolute;
+    left: calc(8px * (1 - var(--plein)));
+    right: calc(8px * (1 - var(--plein)));
+    top: 0;
+    height: calc(100% - 8px * (1 - var(--plein)));
+    z-index: 10;
+    padding: 10px 18px 18px;
+    border-radius: calc(40px - 4px * var(--plein));
+    display: grid;
+    grid-template-rows: auto auto auto 1fr;
+    gap: 14px;
+    align-content: start;
+    touch-action: none;
+    will-change: transform;
+  }
+  .feuille > * {
+    position: relative;
+    z-index: 2;
+  }
+  .poignee {
+    justify-self: center;
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgb(var(--lg-encre) / 0.3);
+    cursor: grab;
+  }
+  .feuille-tete {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+  .feuille-tete h4 {
+    margin: 0;
+  }
+  .convs.petite li {
+    grid-template-columns: 40px 1fr;
+    background: transparent;
+    padding: 6px 4px;
+    border-radius: 0;
+    border-bottom: 1px solid rgb(var(--lg-encre) / 0.08);
+  }
+  .convs.petite .photo {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .alerte-voile {
+    z-index: 11;
+    opacity: 0.35;
+  }
+  .alerte {
+    position: absolute;
+    z-index: 12;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 290px;
+    padding: 22px 20px 16px;
+    border-radius: 34px;
+    text-align: center;
+    display: grid;
+    gap: 6px;
+  }
+  .alerte > * {
+    position: relative;
+    z-index: 2;
+  }
+  .alerte h4,
+  .alerte p {
+    margin: 0;
+  }
+  .alerte-boutons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
   }
 
   .toast {
-    position: fixed;
+    position: absolute;
+    top: 12px;
     left: 50%;
-    bottom: max(24px, env(safe-area-inset-bottom));
-    translate: -50% 140%;
+    z-index: 20;
+    translate: -50% -140%;
     padding: 12px 20px;
-    border-radius: var(--r-pilule);
-    background: var(--encre);
-    color: var(--sur-encre);
+    border-radius: 999px;
     font: 600 14px 'Commissioner', sans-serif;
-    opacity: 0;
-    transition: translate var(--duree-moyenne) var(--courbe-entree), opacity var(--duree-courte);
-    z-index: 60;
+    transition: translate 420ms var(--courbe-ressort);
+    white-space: nowrap;
   }
   .toast.visible {
     translate: -50% 0;
-    opacity: 1;
   }
 
-  @media (max-width: 760px) {
-    .grille-2 {
+  @media (max-width: 900px) {
+    .plan,
+    .demo {
       grid-template-columns: 1fr;
     }
-    .echelle > div {
-      grid-template-columns: 1fr;
-      gap: 6px;
+    .telephone {
+      justify-self: center;
     }
-    .tete {
-      padding-top: 120px;
+  }
+  @media (max-width: 520px) {
+    .telephone {
+      padding: 0;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      height: 760px;
+      width: 100%;
+    }
+    .ecran {
+      border-radius: 36px;
+    }
+    .reglage-ligne {
+      grid-template-columns: auto 1fr;
+    }
+    .reglage-ligne .caption {
+      display: none;
+    }
+    .ligne-curseur {
+      grid-template-columns: 1fr auto;
+    }
+    .ligne-curseur .lgc {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+    .lgp {
+      grid-column: 2;
     }
   }
 </style>

@@ -21,8 +21,8 @@ const transports = [
         Droplet relie les téléphones entre eux par Bluetooth et Wi-Fi. Pas d’internet, pas d’opérateur, pas de serveur au milieu.
       </p>
       <div class="boutons">
-        <a class="bouton bouton-principal" href="#telecharger">Télécharger pour Android</a>
-        <a class="bouton bouton-secondaire" href="#chemin">Voir comment ça passe</a>
+        <a class="lgb lg lg-proeminent lgb-grand" href="#telecharger">Télécharger pour Android</a>
+        <a class="lgb lg lgb-grand" href="#chemin">Voir comment ça passe</a>
       </div>
       <p class="caption indice">Passez le doigt sur la vitre : la buée s’en va, puis revient.</p>
     </div>
@@ -104,14 +104,17 @@ const transports = [
     <h2 id="titre-fin" class="headline">Prêt avant la prochaine coupure.</h2>
     <p class="body doux">Pour Android 7.0 ou plus récent.</p>
     <div class="boutons">
-      <a class="bouton bouton-principal" href="https://github.com/rito27959-arch/droplet/releases/latest">Télécharger pour Android</a>
-      <a class="bouton bouton-discret" href="https://dropletmesh.app/security/">Lire la page sécurité</a>
+      <a class="lgb lg lg-proeminent lgb-grand" href="https://github.com/rito27959-arch/droplet/releases/latest">Télécharger pour Android</a>
+      <a class="lgb lg lgb-grand" href="https://dropletmesh.app/security/">Lire la page sécurité</a>
     </div>
   </section>
 </Base>
 
 <script>
   import { mountWater } from '../scripts/rain';
+  import { lensAll } from '../scripts/liquid';
+  document.querySelectorAll<HTMLElement>('.lgb').forEach((el) => (el.dataset.lens = 'bord'));
+  lensAll();
 
   const canvas = document.querySelector<HTMLCanvasElement>('.vitre-eau');
   if (canvas) {
@@ -218,10 +221,6 @@ const transports = [
     gap: var(--e-3);
     margin-top: var(--e-6);
     pointer-events: auto;
-  }
-  .vitre .bouton-secondaire {
-    background: color-mix(in srgb, var(--surface) 55%, transparent);
-    border-color: color-mix(in srgb, var(--encre) 18%, transparent);
   }
   .indice {
     margin: var(--e-5) 0 0;
@@ -339,8 +338,16 @@ const transports = [
     max-width: 52ch;
   }
 
+  /* Le dernier appel se pose sur un fond vivant : le verre a besoin de quelque chose à courber. */
   .fin {
-    text-align: left;
+    width: auto;
+    margin: var(--e-9) var(--gouttiere) 0;
+    padding: var(--e-9) max(var(--gouttiere), calc((100% - var(--largeur)) / 2)) var(--e-9);
+    border-radius: 40px;
+    background: url('/images/papier-clair.jpg') center / cover;
+  }
+  :root[data-theme='dark'] .fin {
+    background-image: url('/images/papier-sombre.jpg');
   }
   .fin .body {
     margin: var(--e-4) 0 0;

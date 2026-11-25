@@ -109,6 +109,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -305,6 +309,13 @@ a {
 .lens .verre[data-lens] {
   -webkit-backdrop-filter: url(#lentille-nav) blur(10px) saturate(170%);
   backdrop-filter: url(#lentille-nav) blur(10px) saturate(170%);
+}
+
+/* Mobile : la barre d'onglets du site est en bas, le contenu ne passe pas dessous. */
+@media (max-width: 760px) {
+  body {
+    padding-bottom: 96px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
